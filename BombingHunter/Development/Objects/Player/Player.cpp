@@ -32,7 +32,7 @@ void Player::Initialize()
 	radian = 0.0f;
 
 	//大きさの設定
-	scale = 64.0f;
+	box_size = 64.0f;
 
 	//初期画像の設定
 	image = animation[0];
@@ -56,11 +56,13 @@ void Player::Draw() const
 	//デバッグ用
 #if _DEBUG
 	//当たり判定の可視化
-	Vector2D box_collision_upper_left = location - (scale / 2.0f);
-	Vector2D box_collision_lower_right = location + (scale / 2.0f);
+	Vector2D t1 = location - (box_size / 2.0f);
+	Vector2D br = location + (box_size / 2.0f);
 
-	DrawBoxAA(box_collision_upper_left.x, box_collision_upper_left.y, box_collision_lower_right.x, box_collision_lower_right.y, GetColor(255, 0, 0), FALSE);
+	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
 #endif
+	__super::Draw();
+
 }
 
 //終了時処理
@@ -86,12 +88,12 @@ void Player::Movement()
 	//左右移動
 	if (InputControl::GetKey(KEY_INPUT_LEFT))
 	{
-		velocity.x += 1.0f;
+		velocity.x += 5.0f;
 		flip_flag = TRUE;
 	}
 	else if (InputControl::GetKey(KEY_INPUT_RIGHT))
 	{
-		velocity.x += -1.0f;
+		velocity.x += -5.0f;
 		flip_flag = FALSE;
 	}
 	else

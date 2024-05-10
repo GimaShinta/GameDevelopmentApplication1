@@ -1,5 +1,7 @@
 #include "Scene.h"
 #include "../Objects/Player/Player.h"
+#include "../Objects/BoxEnemy/BoxEnemy.h"
+#include "../Objects/Harpy/Harpy.h"
 
 //コンストラクタ
 Scene::Scene() :objects()
@@ -18,7 +20,8 @@ Scene::~Scene()
 void Scene::Initialize()
 {
 	//プレイヤーを生成する
-	CreateObject<Player>(Vector2D(320.0f, 240.0f));
+	CreateObject<Player>(Vector2D(320.0f, 100.0f));
+	CreateObject<BoxEnemy>(Vector2D(320.0f, 400.0f));
 }
 
 //更新処理
