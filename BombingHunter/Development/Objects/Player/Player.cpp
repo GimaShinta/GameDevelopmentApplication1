@@ -88,12 +88,12 @@ void Player::Movement()
 	//¶‰EˆÚ“®
 	if (InputControl::GetKey(KEY_INPUT_LEFT))
 	{
-		velocity.x += 5.0f;
+		velocity.x += -1.0f;
 		flip_flag = TRUE;
 	}
 	else if (InputControl::GetKey(KEY_INPUT_RIGHT))
 	{
-		velocity.x += -5.0f;
+		velocity.x += 1.0f;
 		flip_flag = FALSE;
 	}
 	else
@@ -102,6 +102,20 @@ void Player::Movement()
 	}
 
 	//Œ»İ‚ÌˆÊ’uÀ•W‚É‘¬‚³‚ğ‰ÁZ‚·‚é
+	location += velocity;
+
+	//“–‚½‚è”»’è‚Ìİ’è
+	if (location.x < (box_size.x / 2.0f))
+	{
+		velocity.x = 0.0f;
+		location.x = box_size.x / 2.0f;
+	}
+	else if ((640.0f - (box_size.x / 2.0f)) < location.x)
+	{
+		velocity.x = 0.0f;
+		location.x = 640.0f - (box_size.x / 2.0f);
+	}
+
 	location += velocity;
 }
 

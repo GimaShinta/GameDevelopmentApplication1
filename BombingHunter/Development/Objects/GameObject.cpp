@@ -6,8 +6,9 @@ GameObject::GameObject() :
 	location(0.0f),
 	box_size(0.0f),
 	radian(0.0f),
-	image(0),
-	sound(0)
+	image(NULL),
+	sound(NULL),
+	delete_flag(FALSE)
 {
 
 }
@@ -33,13 +34,30 @@ void GameObject::Update()
 //•`‰æˆ—
 void GameObject::Draw() const
 {
+	//“–‚½‚è”»’è‚Ì‰ÂŽ‹‰»
+#ifdef D_PIVOT_CENTER
+	Vector2D t1 = location - (box_size / 2.0f);
+	Vector2D br = location + (box_size / 2.0f);
 
+	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
+
+#else
+	Vector2D t1 = location;
+	Vector2D br = location + box_size;
+
+	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
+#endif //D_PIVOT_CENTER
 }
 
 //I—¹Žžˆ—
 void GameObject::Finalize()
 {
 
+}
+
+bool GameObject::DeleteObjectFanc()
+{
+	return this->delete_flag;
 }
 
 //“–‚½‚è”»’è’Ê’mˆ—
@@ -58,4 +76,10 @@ Vector2D GameObject::GetLocation() const
 void GameObject::SetLocation(const Vector2D& location)
 {
 	this->location = location;
+}
+
+//“–‚½‚è”»’è‚Ì‘å‚«‚³‚ðŽæ“¾‚·‚é
+Vector2D GameObject::GetBoxSize() const
+{
+	return box_size;
 }

@@ -1,8 +1,11 @@
 #include "BoxEnemy.h"
 #include "../../Utility/InputControl.h"
 #include "DxLib.h"
+#include "../../Scene/Scene.h"
+#include "../Bomb/Bomb.h"
+#include "../Player/Player.h"
 
-BoxEnemy::BoxEnemy():animation_count(0),flip_flag(FALSE)
+BoxEnemy::BoxEnemy():animation_count(0)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
@@ -33,32 +36,40 @@ void BoxEnemy::Initialize()
 	//初期画像の設定
 	image = animation[0];
 
+	//初期進行方向の設定
+	direction = Vector2D(1.0f, 0);
+
 }
 
 void BoxEnemy::Update()
 {
-	location.x += 1.0f;
+	//移動処理
+	Movement();
 
-	//右の画面端から左の画面端に移動する
-	if (location.x >= 700.0f)
-	{
-		location.x = 0.0f;
-	}
+	//アニメーション制御
+	AnimetionControl();
 }
 
 void BoxEnemy::Draw() const
 {
-	DrawRotaGraph(location.x, location.y, 1.0, radian, image, TRUE, flip_flag);
+	//画像反転フラグ
+	int flip_flag = FALSE;
 
-	//デバッグ用
-#if _DEBUG
-	//当たり判定の可視化
-	Vector2D t1 = location - (box_size / 2.0f);
-	Vector2D br = location + (box_size / 2.0f);
+	//進行方向によって、反転状態を決定する
+	if (direction.x > 0.0f)
+	{
+		flip_flag = FALSE;
+	}
+	else
+	{
+		flip_flag = TRUE;
+	}
 
-	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
-#endif
+	//情報を基にハコテキ画像を描画する
+	DrawRotaGraphF(location.x, location.y, 1.0, radian, image, TRUE, flip_flag);
 
+	//親クラスの描画処理を呼び出す
+	__super::Draw();
 }
 
 void BoxEnemy::Finalize()
@@ -70,9 +81,35 @@ void BoxEnemy::Finalize()
 
 void BoxEnemy::OnHitCollision(GameObject* hit_object)
 {
+	//当たった時の処理
+	if (dynamic_cast<BoxEnemy*>(hit_object) != nullptr)
+	{
+		delete_flag = FALSE;
+	}
+	else
+	{
+		delete_flag = TRUE;
+	}
 }
 
-void BoxEnemy::AnimeControl()
+void BoxEnemy::Movement()
+{
+	//画面端に到達したら、進行方向を反転する
+	if (((location.x + direction.x) < box_size.x)
+		|| (640.0f - box_size.x) < (location.x + direction.x))
+	{
+		direction.x *= -1.0f;
+	}
+
+	if (((location.y + direction.y) < box_size.y) || (480.0f - box_size.y) < (location.y + direction.y))
+	{
+		direction.y *= -1.0f;
+	}
+	//進行方向に向かって、位置座標を変更する
+	location += direction;
+}
+
+void BoxEnemy::AnimetionControl()
 {
 	//フレームカウントを加算する
 	animation_count++;

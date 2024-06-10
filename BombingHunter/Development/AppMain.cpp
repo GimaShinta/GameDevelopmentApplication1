@@ -40,7 +40,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			scene->Update();
 
 			//‰æ–Ê‚Ì‰Šú‰»
-			ClearDrawScreen();
+ 			ClearDrawScreen();
 
 			//ƒV[ƒ“‚Ì•`‰æˆ—
 			scene->Draw();

@@ -35,7 +35,7 @@ void Enemy::Initialize()
 	image = animation[0];
 
 	//初期進行方向の設定
-	direction = Vector2D(-1.0f, 0.5f);
+	direction = Vector2D(1.0f, -0.5f);
 }
 
 //更新処理
@@ -57,11 +57,11 @@ void Enemy::Draw() const
 	//進行方向によって、反転状態を決定する
 	if (direction.x > 0.0f)
 	{
-		flip_flag = TRUE;
+		flip_flag = FALSE;
 	}
 	else
 	{
-		flip_flag = FALSE;
+		flip_flag = TRUE;
 	}
 
 	//情報を基にハコテキ画像を描画する
@@ -90,7 +90,8 @@ void Enemy::OnHitCollision(GameObject* hit_object)
 void Enemy::Movement()
 {
 	//画面端に到達したら、進行方向を反転する
-	if (((location.x + direction.x) < box_size.x) || (640.0f - box_size.x) < (location.x + direction.x))
+	if (((location.x + direction.x) < box_size.x) 
+		|| (640.0f - box_size.x) < (location.x + direction.x))
 	{
 		direction.x *= -1.0f;
 	}

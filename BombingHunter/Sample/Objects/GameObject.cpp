@@ -45,7 +45,7 @@ void GameObject::Draw() const
 	Vector2D br = location + box_size;
 
 	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
-#endif D_PIVOT_CENTER
+#endif //D_PIVOT_CENTER
 
 }
 
@@ -73,6 +73,7 @@ void GameObject::SetLocation(const Vector2D& location)
 	this->location = location;
 }
 
+//“–‚½‚è”»’è‚Ì‘å‚«‚³‚ðŽæ“¾‚·‚é
 Vector2D GameObject::GetBoxSize() const
 {
 	return box_size;
