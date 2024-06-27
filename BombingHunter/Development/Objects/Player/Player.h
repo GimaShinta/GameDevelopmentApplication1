@@ -6,8 +6,8 @@ class Player :public GameObject
 {
 private:
 	int animation[2];        //アニメーション
-	int animation_count;     //
-	int flip_flag;           //反転フラグ
+	int animation_count;     //アニメーションカウント
+	int flip_flag;           //画像反転フラグ
 
 public:
 	Player();
@@ -25,5 +25,5 @@ private:
 	//移動処理
 	void Movement();
 	//アニメーション制御
-	void AnimeControl();
+	void AnimationControl();
 };

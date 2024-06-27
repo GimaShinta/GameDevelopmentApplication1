@@ -4,10 +4,24 @@
 #include <string>
 #include "../Objects/GameObject.h"
 
+#define TIMELIMIT 3000*3
+
 class Scene
 {
 private:
+
 	std::vector<GameObject*>objects;
+
+	int f_color;                 //フォントカラー（黒）
+	int object_score;            //スコア結果
+	int gametime;                // 時間制限
+	int ctime_count;             //一定時間
+	int scene_image[3];
+	int number_animation[10];    //数字画像
+	bool b_flag;                 //爆弾生成フラグ
+	bool object_flip;            //画像反転フラグ
+	Vector2D obj_location;       //オブジェクト比較用位置情報
+	Vector2D create_location;    //オブジェクト生成位置
 
 public:
 	Scene();
@@ -17,6 +31,10 @@ public:
 	void Update();
 	void Draw() const;
 	void Finalize();
+	void RandamCreate();          //ランダムに敵を生成する
+	void ScreenOut();             //画面外のオブジェクトを削除
+	void HitDelete();             //ヒットオブジェクトの削除
+	void BombCreate();            //爆弾を生成する
 
 private:
 	//当たり判定チェック処理
@@ -40,6 +58,7 @@ private:
 
 		//初期化処理
 		new_object->Initialize();
+
 		//位置情報の設定
 		new_object->SetLocation(location);
 

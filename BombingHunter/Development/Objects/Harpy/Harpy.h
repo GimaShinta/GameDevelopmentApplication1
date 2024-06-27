@@ -7,7 +7,6 @@ class Harpy :public GameObject
 private:
 	int animation[2];
 	int animation_count;
-	int flip_flag;
 
 public:
 	Harpy();
@@ -22,6 +21,8 @@ public:
 	virtual void OnHitCollision(GameObject* hit_object) override;
 
 private:
+	//移動処理
+	void Movement();
 	//アニメーション制御
-	void AnimeControl();
+	void AnimationControl();
 };

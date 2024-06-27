@@ -2,7 +2,10 @@
 #include "../../Utility/InputControl.h"
 #include "DxLib.h"
 
-Harpy::Harpy() :animation_count(0), flip_flag(FALSE)
+//型変換用
+#include "../Bomb/Bomb.h"
+
+Harpy::Harpy() :animation_count(0)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
@@ -12,6 +15,7 @@ Harpy::~Harpy()
 {
 }
 
+//初期化処理
 void Harpy::Initialize()
 {
 	//画像の読み込み
@@ -33,34 +37,35 @@ void Harpy::Initialize()
 	//初期画像の設定
 	image = animation[0];
 
+	//初期進行方向の設定
+	direction = Vector2D(0, 0);
 }
 
+//更新処理
 void Harpy::Update()
 {
-	location.x += 1.0f;
+	//移動処理
+	Movement();
+	//アニメーション制御
+	AnimationControl();
 
-	//右の画面端から左の画面端に移動する
-	if (location.x >= 700.0f)
-	{
-		location.x = 0.0f;
-	}
+	// アルファ値を変化
+	a += b;
 }
 
+//描画処理
 void Harpy::Draw() const
 {
-	DrawRotaGraph(location.x, location.y, 1.0, radian, image, TRUE, flip_flag);
+	//情報を基にハーピー画像を描画する
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, a);
+	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	//デバッグ用
-#if _DEBUG
-	//当たり判定の可視化
-	Vector2D t1 = location - (box_size / 2.0f);
-	Vector2D br = location + (box_size / 2.0f);
-
-	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
-#endif
-
+	//親クラスの描画処理を呼び出す
+	__super::Draw();
 }
 
+//終了時処理
 void Harpy::Finalize()
 {
 	//使用した画像を解放する
@@ -68,11 +73,46 @@ void Harpy::Finalize()
 	DeleteGraph(animation[1]);
 }
 
+//当たり判定通知処理
 void Harpy::OnHitCollision(GameObject* hit_object)
 {
+	//当たった時の処理
+	//ヒット時処理
+	if (dynamic_cast<Bomb*>(hit_object) != nullptr)
+	{
+		//消す
+		delete_flag = TRUE;
+
+		//スコア
+		score += -100;
+	}
+	else
+	{
+		//消さない
+		delete_flag = FALSE;
+	}
 }
 
-void Harpy::AnimeControl()
+//移動処理
+void Harpy::Movement()
+{
+	//左から出現
+	if (flip_flag == FALSE)
+	{
+		direction.x = 1;
+	}
+	//右から出現
+	else
+	{
+		direction.x = -1;
+	}
+
+	//進行方向に向かって、位置座標を変更する
+	location += direction;
+}
+
+//アニメーション制御
+void Harpy::AnimationControl()
 {
 	//フレームカウントを加算する
 	animation_count++;

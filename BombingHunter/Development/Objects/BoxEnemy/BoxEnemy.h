@@ -7,8 +7,7 @@ class BoxEnemy :public GameObject
 private:
 	int animation[2];
 	int animation_count;
-	Vector2D direction;     //進行方向
-
+	
 public:
 	BoxEnemy();
 	~BoxEnemy();
@@ -23,7 +22,7 @@ public:
 
 private:
 	//移動処理
-	void Movement();
+	void Movement();	
 	//アニメーション制御
-	void AnimetionControl();
+	void AnimationControl();
 };

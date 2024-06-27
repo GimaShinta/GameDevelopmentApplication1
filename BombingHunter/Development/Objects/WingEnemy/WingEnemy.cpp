@@ -1,31 +1,31 @@
-#include "BoxEnemy.h"
+#include "WingEnemy.h"
 #include "../../Utility/InputControl.h"
 #include "DxLib.h"
 
 //型変換用
 #include "../Bomb/Bomb.h"
 
-BoxEnemy::BoxEnemy():animation_count(0)
+WingEnemy::WingEnemy():animation_count(0)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
 }
 
-BoxEnemy::~BoxEnemy()
+WingEnemy::~WingEnemy()
 {
 }
 
 //初期化処理
-void BoxEnemy::Initialize()
+void WingEnemy::Initialize()
 {
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/Images/BoxEnemy/1.png");
-	animation[1] = LoadGraph("Resource/Images/BoxEnemy/2.png");
+	animation[0] = LoadGraph("Resource/Images/WingEnemy/1.png");
+	animation[1] = LoadGraph("Resource/Images/WingEnemy/2.png");
 
 	//エラーチェック
 	if (animation[0] == -1 || animation[1] == -1)
 	{
-		throw("ボックスエネミーの画像がありません\n");
+		throw("ハネテキの画像がありません\n");
 	}
 
 	//向きの設定
@@ -43,7 +43,7 @@ void BoxEnemy::Initialize()
 }
 
 //更新処理
-void BoxEnemy::Update()
+void WingEnemy::Update()
 {
 	//移動処理
 	Movement();
@@ -53,9 +53,9 @@ void BoxEnemy::Update()
 }
 
 //描画処理
-void BoxEnemy::Draw() const
+void WingEnemy::Draw() const
 {
-	//情報を基にハコテキ画像を描画する
+	//情報を基にハネテキ画像を描画する
 	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 
 	//親クラスの描画処理を呼び出す
@@ -63,7 +63,7 @@ void BoxEnemy::Draw() const
 }
 
 //終了時処理
-void BoxEnemy::Finalize()
+void WingEnemy::Finalize()
 {
 	//使用した画像を解放する
 	DeleteGraph(animation[0]);
@@ -71,7 +71,7 @@ void BoxEnemy::Finalize()
 }
 
 //当たり判定通知処理
-void BoxEnemy::OnHitCollision(GameObject* hit_object)
+void WingEnemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
 	//ヒット時通知
@@ -79,9 +79,8 @@ void BoxEnemy::OnHitCollision(GameObject* hit_object)
 	{
 		//消す
 		delete_flag = TRUE;
-
 		//スコア
-		score += 200;
+		score += 30;
 	}
 	else
 	{
@@ -91,17 +90,32 @@ void BoxEnemy::OnHitCollision(GameObject* hit_object)
 }
 
 //移動処理
-void BoxEnemy::Movement()
+void WingEnemy::Movement()
 {
+	int we_rd = rand() % 10 + 1;
 	//右から出現
 	if (flip_flag == FALSE)
 	{
-		direction.x = 1;
+		if (we_rd < 7)
+		{
+			direction.x = 1;
+		}
+		else
+		{
+			direction.x = 2;
+		}
 	}
 	//左から出現
 	else
 	{
-		direction.x = -1;
+		if (we_rd < 7)
+		{
+			direction.x = -1;
+		}
+		else
+		{
+			direction.x = -2;
+		}
 	}
 
 	//進行方向に向かって、位置座標を変更する
@@ -109,7 +123,7 @@ void BoxEnemy::Movement()
 }
 
 //アニメーション制御
-void BoxEnemy::AnimationControl()
+void WingEnemy::AnimationControl()
 {
 	//フレームカウントを加算する
 	animation_count++;

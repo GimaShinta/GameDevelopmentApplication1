@@ -138,9 +138,12 @@
     <ClCompile Include="AppMain.cpp" />
     <ClCompile Include="Objects\Bomb\Bomb.cpp" />
     <ClCompile Include="Objects\BoxEnemy\BoxEnemy.cpp" />
+    <ClCompile Include="Objects\EnemyBullet\EnemyBullet.cpp" />
     <ClCompile Include="Objects\GameObject.cpp" />
+    <ClCompile Include="Objects\GoldEnemy\GoldEnemy.cpp" />
     <ClCompile Include="Objects\Harpy\Harpy.cpp" />
     <ClCompile Include="Objects\Player\Player.cpp" />
+    <ClCompile Include="Objects\WingEnemy\WingEnemy.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Utility\InputControl.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
@@ -148,9 +151,12 @@
   <ItemGroup>
     <ClInclude Include="Objects\Bomb\Bomb.h" />
     <ClInclude Include="Objects\BoxEnemy\BoxEnemy.h" />
+    <ClInclude Include="Objects\EnemyBullet\EnemyBullet.h" />
     <ClInclude Include="Objects\GameObject.h" />
+    <ClInclude Include="Objects\GoldEnemy\GoldEnemy.h" />
     <ClInclude Include="Objects\Harpy\Harpy.h" />
     <ClInclude Include="Objects\Player\Player.h" />
+    <ClInclude Include="Objects\WingEnemy\WingEnemy.h" />
     <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Utility\InputControl.h" />
     <ClInclude Include="Utility\Vector2D.h" />

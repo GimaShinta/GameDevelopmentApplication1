@@ -3,7 +3,7 @@
 #include "DxLib.h"
 
 //コンストラクタ
-Player::Player() :animation_count(0), flip_flag(FALSE)
+Player::Player() :animation_count(0),flip_flag(FALSE)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
@@ -44,14 +44,14 @@ void Player::Update()
 	//移動処理
 	Movement();
 	//アニメーション制御
-	AnimeControl();
+	AnimationControl();
 }
 
 //描画処理
 void Player::Draw() const
 {
 	//プレイヤー画像の描画
-	DrawRotaGraph(location.x, location.y, 1.0, radian, image, TRUE, flip_flag);
+	DrawRotaGraph(location.x, location.y, 0.6, radian, image, TRUE, flip_flag);
 
 	//デバッグ用
 #if _DEBUG
@@ -61,6 +61,8 @@ void Player::Draw() const
 
 	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
 #endif
+
+	//親クラスの描画処理を呼び出す
 	__super::Draw();
 
 }
@@ -77,6 +79,9 @@ void Player::Finalize()
 void Player::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
+	//ヒット時通知
+	//消さない
+	delete_flag = FALSE;
 }
 
 //移動処理
@@ -120,7 +125,7 @@ void Player::Movement()
 }
 
 //アニメーション制御
-void Player::AnimeControl()
+void Player::AnimationControl()
 {
 	//フレームカウントを加算する
 	animation_count++;

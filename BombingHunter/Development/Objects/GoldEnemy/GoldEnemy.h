@@ -1,15 +1,17 @@
 #pragma once
+#pragma once
+
 #include "../GameObject.h"
 
-class Bomb :public GameObject
+class GoldEnemy :public GameObject
 {
 private:
-	int animation[4];
+	int animation[5];
 	int animation_count;
 
 public:
-	Bomb();
-	~Bomb();
+	GoldEnemy();
+	~GoldEnemy();
 
 	virtual void Initialize() override;
 	virtual void Update() override;
@@ -21,7 +23,6 @@ public:
 
 private:
 	//移動処理
-	void Movement();
-	//アニメーション制御
+	void Movement();	//アニメーション制御
 	void AnimationControl();
 };

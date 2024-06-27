@@ -1,12 +1,11 @@
-#include "Bomb.h"
+#include "EnemyBullet.h"
 #include "../../Utility/InputControl.h"
 #include "DxLib.h"
 
 //型変換用
 #include "../Player/Player.h"
-#include "../EnemyBullet/EnemyBullet.h"
 
-Bomb::Bomb() :animation_count(0)
+EnemyBullet::EnemyBullet() :animation_count(0)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -14,44 +13,44 @@ Bomb::Bomb() :animation_count(0)
 	}
 }
 
-Bomb::~Bomb()
+EnemyBullet::~EnemyBullet()
 {
-
 }
 
 //初期化処理
-void Bomb::Initialize()
+void EnemyBullet::Initialize()
 {
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/Images/Bomb/Bomb.png");
-	animation[1] = LoadGraph("Resource/Images/Blast/1.png");
-	animation[2] = LoadGraph("Resource/Images/Blast/2.png");
-	animation[3] = LoadGraph("Resource/Images/Blast/3.png");
+	animation[0] = LoadGraph("Resource/Images/EnemyBullet/1.png");
+	animation[1] = LoadGraph("Resource/Images/EnemyBullet/eff1.png");
+	animation[2] = LoadGraph("Resource/Images/EnemyBullet/eff2.png");
+	animation[3] = LoadGraph("Resource/Images/EnemyBullet/eff3.png");
 
 	//エラーチェック
 	for (int i = 0; i < 4; i++)
 	{
 		if (animation[i] == -1)
 		{
-			throw("爆弾の画像がありません\n");
+			throw("テキ弾の画像がありません\n");
 		}
 	}
 
 	//向きの設定
-	radian = 0;
+	radian = 0.0f;
 
 	//大きさの設定
-	box_size = (64.0f/5)*4;
+	box_size = (64.0f/3)*2;
 
 	//初期画像の設定
 	image = animation[0];
 
 	//初期進行方向の設定
-	direction = Vector2D(0.0f, 1.0f);
+	direction = Vector2D(0, 0);
+
 }
 
 //更新処理
-void Bomb::Update()
+void EnemyBullet::Update()
 {
 	//移動処理
 	Movement();
@@ -64,52 +63,48 @@ void Bomb::Update()
 }
 
 //描画処理
-void Bomb::Draw() const
-{	
-	//情報を基に爆弾の画像を描画する
-	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, flip_flag);
+void EnemyBullet::Draw() const
+{
+	//情報を基にテキ弾の画像を描画する
+	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 
 	//親クラスの描画処理を呼び出す
 	__super::Draw();
 }
 
 //終了時処理
-void Bomb::Finalize()
+void EnemyBullet::Finalize()
 {
 	//使用した画像を解放する
-	for (int i = 0; i < 4; i++)
-	{
-		DeleteGraph(animation[i]);
-	}
+	DeleteGraph(animation[0]);
+	DeleteGraph(animation[1]);
+	DeleteGraph(animation[2]);
+	DeleteGraph(animation[3]);
 }
 
 //当たり判定通知処理
-void Bomb::OnHitCollision(GameObject* hit_object)
+void EnemyBullet::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
 	//ヒット時通知
 	if (dynamic_cast<Player*>(hit_object) != nullptr)
 	{
-		//消さない
-		animation_flag = FALSE;
-	}
-	else if (dynamic_cast<EnemyBullet*>(hit_object) != nullptr)
-	{
-		//消さない
-		animation_flag = FALSE;
+		//消す（アニメーション可能）
+		animation_flag = TRUE;
+
+		//スコア
+		score += -100;
 	}
 	else
 	{
-		animation_flag = TRUE;
+		//消さない
+		animation_flag = FALSE;
 	}
 }
 
 //移動処理
-void Bomb::Movement()
+void EnemyBullet::Movement()
 {
-	//direction.x = 1.0f;
-	//direction.y += 0.01f;
-	//radian += 0.005;
 	//進行方向に向かって、位置座標を変更する
 	if (animation_flag == TRUE)
 	{
@@ -119,12 +114,12 @@ void Bomb::Movement()
 }
 
 //アニメーション制御
-void Bomb::AnimationControl()
+void EnemyBullet::AnimationControl()
 {
-	direction = 0;
 	//フレームカウントを加算する
 	animation_count++;
-    //60フレーム目に到達したら
+
+	//15フレーム目に到達したら
 	if (animation_count >= 15)
 	{
 		//カウントのリセット
@@ -139,7 +134,7 @@ void Bomb::AnimationControl()
 		{
 			image = animation[2];
 		}
-		else if(image==animation[2])
+		else if (image == animation[2])
 		{
 			image = animation[3];
 		}

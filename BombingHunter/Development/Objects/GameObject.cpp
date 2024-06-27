@@ -5,12 +5,17 @@
 GameObject::GameObject() :
 	location(0.0f),
 	box_size(0.0f),
+	image_size(0.7),
 	radian(0.0f),
 	image(NULL),
 	sound(NULL),
-	delete_flag(FALSE)
+	delete_flag(FALSE),
+	flip_flag(FALSE),
+	animation_flag(FALSE),
+	score(0),
+	a(255),
+	b(-1)
 {
-
 }
 
 //デストラクタ
@@ -34,19 +39,11 @@ void GameObject::Update()
 //描画処理
 void GameObject::Draw() const
 {
-	//当たり判定の可視化
-#ifdef D_PIVOT_CENTER
+
 	Vector2D t1 = location - (box_size / 2.0f);
 	Vector2D br = location + (box_size / 2.0f);
 
 	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
-
-#else
-	Vector2D t1 = location;
-	Vector2D br = location + box_size;
-
-	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
-#endif //D_PIVOT_CENTER
 }
 
 //終了時処理
@@ -55,7 +52,8 @@ void GameObject::Finalize()
 
 }
 
-bool GameObject::DeleteObjectFanc()
+//各オブジェクトの削除フラグ取得
+bool GameObject::GetDeleteFlag()
 {
 	return this->delete_flag;
 }
@@ -72,10 +70,28 @@ Vector2D GameObject::GetLocation() const
 	return this->location;
 }
 
+//スコアの値を取得
+int GameObject::GetScore()
+{
+	return this->score;
+}
+
 //位置情報設定処理
 void GameObject::SetLocation(const Vector2D& location)
 {
 	this->location = location;
+}
+
+//進行方向設定処理
+void GameObject::SetDirection(const Vector2D& direction)
+{
+	this->direction = direction;
+}
+
+//画像反転フラグの取得
+void GameObject::SetFlipFlag(bool flag)
+{
+	this->flip_flag = flag;
 }
 
 //当たり判定の大きさを取得する

@@ -1,15 +1,16 @@
 #pragma once
+
 #include "../GameObject.h"
 
-class Bomb :public GameObject
+class EnemyBullet :public GameObject
 {
 private:
 	int animation[4];
 	int animation_count;
 
 public:
-	Bomb();
-	~Bomb();
+	EnemyBullet();
+	~EnemyBullet();
 
 	virtual void Initialize() override;
 	virtual void Update() override;
