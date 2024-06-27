@@ -32,7 +32,10 @@ void Player::Initialize()
 	radian = 0.0f;
 
 	//大きさの設定
-	box_size = 64.0f;
+	box_size = (64.0f / 5) * 4;
+
+	//画像サイズの設定
+	image_size = 0.6;
 
 	//初期画像の設定
 	image = animation[0];
@@ -51,7 +54,7 @@ void Player::Update()
 void Player::Draw() const
 {
 	//プレイヤー画像の描画
-	DrawRotaGraph(location.x, location.y, 0.6, radian, image, TRUE, flip_flag);
+	DrawRotaGraph(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 
 	//デバッグ用
 #if _DEBUG

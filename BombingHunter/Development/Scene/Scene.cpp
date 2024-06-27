@@ -11,19 +11,20 @@
 #include <math.h>
 
 //コンストラクタ
-Scene::Scene() :objects(),b_flag(FALSE),object_flip(FALSE),object_score(0)
+Scene::Scene() :objects(),b_flag(FALSE),object_flip(FALSE),object_score(0),image(NULL),ctime_count(0),image_count(0)
 {
-	ctime_count = 0;
 	gametime = TIMELIMIT;
+
 	f_color = GetColor(255, 255, 255);
 
 	for (int i = 0; i < 10; i++)
 	{
 		number_animation[i] = NULL;
 	}
-	scene_image[0] = NULL;
-	scene_image[1] = NULL;
-	scene_image[2] = NULL;
+	for (int i = 0; i < 8; i++)
+	{
+		scene_image[i] = NULL;
+	}
 }
 
 //デストラクタ
@@ -50,21 +51,29 @@ void Scene::Initialize()
 	scene_image[0] = LoadGraph("Resource/Images/TimeLimit/timer-03.png");
 	scene_image[1] = LoadGraph("Resource/Images/Score/font-21.png");
 	scene_image[2] = LoadGraph("Resource/Images/Score/hs.png");
+	scene_image[3] = LoadGraph("Resource/Images/Evaluation/BAD.png");
+	scene_image[4] = LoadGraph("Resource/Images/Evaluation/Finish.png");
+	scene_image[5] = LoadGraph("Resource/Images/Evaluation/GOOD.png");
+	scene_image[6] = LoadGraph("Resource/Images/Evaluation/OK.png");
+	scene_image[7] = LoadGraph("Resource/Images/Evaluation/Perfect.png");
+
+	image = scene_image[4];
 
 	//エラーチェック
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		if (number_animation[i] == -1)
 		{
 			throw("数字の画像がありません\n");
 		}
 	}
-
-	if (number_animation[0] == -1|| number_animation[1] == -1 || number_animation[2] == -1 )
+	for (int i = 0; i < 8; i++)
 	{
-		throw("シーンUIの画像がありません\n");
+		if (scene_image[i] == -1)
+		{
+			throw("シーンUIの画像がありません\n");
+		}
 	}
-
 
 	//プレイヤーを生成する
 	CreateObject<Player>(Vector2D(320.0f, 50.0f));
@@ -90,26 +99,35 @@ void Scene::Update()
 	}
 
 	//一定時間で生成する
-	if (ctime_count >= 250)
+	if (ctime_count >= 200)
 	{
+		//オブジェクトの生成
 		RandamCreate();
+		//カウントリセット
 		ctime_count = 0;
 	}
 	else
 	{
+		//カウントを増やす
 		ctime_count++;
 	}
 
 	//爆弾を生成する
 	BombCreate();
 
-	//画面外のオブジェクトを削除
-	ScreenOut();
+	//オブジェクトの削除
+	DeleteObject();
 
-	//ヒットオブジェクトの削除
-	HitDelete();
-
-	gametime--;
+	//時間経過で全オブジェクトの削除
+	if (gametime <= 0)
+	{
+		ResultScene();
+	}
+	else
+	{
+		//カウントを減らす
+		gametime--;
+	}
 }
 
 //描画処理
@@ -119,18 +137,21 @@ void Scene::Draw() const
 	int bgimage = LoadGraph("Resource/Images/BackGround.png");
 	DrawGraph(0, 0, bgimage, FALSE);
 
-	//int time;
-	//LONGLONG timelimit = GetNowHiPerformanceCount() + 120000000;
-	//time = int(timelimit - GetNowHiPerformanceCount());
-	//DrawFormatString(5, 5, f_color, "%02d'%02d'%d%d", time / 60000000);
-
-	//スコア表示
-	DrawFormatString(150, 450, f_color, "スコア %d", object_score);
+	//制限時間表示
 	DrawGraph(40, 450, number_animation[gametime / 150 / 10],FALSE);
 	DrawGraph(60, 450, number_animation[gametime / 150 % 10],FALSE);
-	DrawRotaGraphF(20, 460, 0.5, 0.0,number_animation[0], TRUE, TRUE);
+	DrawRotaGraphF(20, 460, 0.5, 0.0, scene_image[0], TRUE, FALSE);
+	//スコア表示
+	DrawGraph(130, 450, scene_image[1],FALSE);
+	DrawGraph(300, 450, scene_image[2],FALSE);
+	DrawFormatString(200, 450, f_color, "%d", object_score);
 
-	DrawRotaGraphF(20, 460, 0.5, 0.0, scene_image[0], TRUE, TRUE);
+	//時間経過でFinishを表示
+	if (gametime <= 0)
+	{
+		DrawRotaGraphF(300, 200, 0.5, 0.0, image, TRUE, FALSE);
+	}
+
 	//シーンに存在するオブジェクトの描画処理
 	for (GameObject* obj : objects)
 	{
@@ -146,10 +167,10 @@ void Scene::Finalize()
 	{
 		DeleteGraph(number_animation[i]);
 	}
-
-	DeleteGraph(scene_image[0]);
-	DeleteGraph(scene_image[1]);
-	DeleteGraph(scene_image[2]);
+	for (int i = 0; i < 8; i++)
+	{
+		DeleteGraph(scene_image[i]);
+	}
 
 	//動的配列が空なら処理を終了する
 	if (objects.empty())
@@ -175,21 +196,25 @@ void Scene::RandamCreate()
 	//x座標の生成位置ランダムと画像の反転
 	if(rand() % 10 + 1 <= 5)
 	{
+		//左から出現
 		create_location.x = 0.0f;
 		object_flip = FALSE;
 	}
 	else
 	{
+		//右から出現
 		create_location.x = 640.0f;
 		object_flip = TRUE;
 	}
 	//y座標の生成位置ランダム
 	if (rand() % 10 + 1 <= 5)
 	{
+		//中央レーン
 		create_location.y = 200.0f;
 	}
 	else
 	{
+		//上のレーン
 		create_location.y = 300.0f;
 	}
 
@@ -204,8 +229,10 @@ void Scene::RandamCreate()
 		{
 			if (dynamic_cast<Player*>(objects[i]) != nullptr)
 			{
+				//テキの位置からプレイヤーへのベクトルを求める
 				Vector2D b = objects[i]->GetLocation() - a->GetLocation();
 				float c = sqrt(pow(b.x, 2) + pow(b.y, 2));
+				//プレイヤーに向かって弾を打つ
 				CreateObject<EnemyBullet>(a->GetLocation())->SetDirection(Vector2D(b.x/c,b.y/c));
 			}
 		}
@@ -213,117 +240,40 @@ void Scene::RandamCreate()
 	else if (obj_rd <= 60)
 	{
 		Harpy* a = CreateObject<Harpy>(Vector2D(create_location.x, create_location.y));
+		//画像反転フラグの設定
 		a->SetFlipFlag(object_flip);
 	}
 	else if (obj_rd <= 90)
 	{
 		WingEnemy* a = CreateObject<WingEnemy>(Vector2D(create_location.x, create_location.y));
+		//画像反転フラグの設定
 		a->SetFlipFlag(object_flip);
 	}
 	else if (obj_rd <= 100)
 	{
 		GoldEnemy* a = CreateObject<GoldEnemy>(Vector2D(create_location.x, 400.0f));
+		//画像反転フラグの設定
 		a->SetFlipFlag(object_flip);
 	}
 
 }
 
-//画面外のオブジェクトを削除
-void Scene::ScreenOut()
-{
-	for (int i = 0; i < objects.size(); i++)
-	{
-		//爆弾
-		if (dynamic_cast<Bomb*>(objects[i]) != nullptr)
-		{
-			//オブジェクトの位置情報を取得
-			obj_location = objects[i]->GetLocation();
-			if (obj_location.y > 480)
-			{
-				//オブジェクトを配列から削除
-				this->objects.erase(objects.begin() + i);
-				//爆弾生成可能
-				b_flag = FALSE;
-			}
-		}
-		//ハコテキ
-		else if (dynamic_cast<BoxEnemy*>(objects[i]) != nullptr)
-		{
-			//オブジェクトの位置情報を取得
-			obj_location = objects[i]->GetLocation();
-			if (obj_location.x > 640)
-			{
-				//オブジェクトを配列から削除
-				this->objects.erase(objects.begin() + i);
-			}
-			if (obj_location.x < 0)
-			{
-				this->objects.erase(objects.begin() + i);
-			}
-		}
-		//ハーピー
-		else if (dynamic_cast<Harpy*>(objects[i]) != nullptr)
-		{
-			//オブジェクトの位置情報を取得
-			obj_location = objects[i]->GetLocation();
-			if (obj_location.x > 640)
-			{
-				//オブジェクトを配列から削除
-				this->objects.erase(objects.begin() + i);
-			}
-			if (obj_location.x < 0)
-			{
-				this->objects.erase(objects.begin() + i);
-			}
-		}
-		//ハネテキ
-		else if (dynamic_cast<WingEnemy*>(objects[i]) != nullptr)
-		{
-			//オブジェクトの位置情報を取得
-			obj_location = objects[i]->GetLocation();
-			if (obj_location.x > 640)
-			{
-				//オブジェクトを配列から削除
-				this->objects.erase(objects.begin() + i);
-			}
-			if (obj_location.x < 0)
-			{
-				this->objects.erase(objects.begin() + i);
-			}
-		}
-		//金テキ
-		else if (dynamic_cast<GoldEnemy*>(objects[i]) != nullptr)
-		{
-			//オブジェクトの位置情報を取得
-			obj_location = objects[i]->GetLocation();
-			if (obj_location.x > 640)
-			{
-				//オブジェクトを配列から削除
-				this->objects.erase(objects.begin() + i);
-			}
-			if (obj_location.x < 0)
-			{
-				this->objects.erase(objects.begin() + i);
-			}
-		}
-	}
-}
-
-//ヒットオブジェクトの削除
-void Scene::HitDelete()
+//オブジェクトの削除
+void Scene::DeleteObject()
 {
 	for (int i = 0; i < objects.size(); i++)
 	{
 		//オブジェクトのDeleteFlag関数へ
 		if (objects[i]->GetDeleteFlag() == TRUE)
 		{
-			//スコアを足していく
+			//スコアを足して合計する
 			object_score += objects[i]->GetScore();
 			//オブジェクトを配列から削除
 			this->objects.erase(objects.begin() + i);
 			//爆弾生成可能
 			b_flag = FALSE;
 
+			//0以下にはならない
 			if (object_score <= 0)
 			{
 				object_score = 0;
@@ -332,6 +282,7 @@ void Scene::HitDelete()
 	}
 }
 
+//爆弾を生成する
 void Scene::BombCreate()
 {
 	//爆弾が存在していなければ生成
@@ -351,6 +302,42 @@ void Scene::BombCreate()
 				}
 			}
 		}
+	}
+}
+
+//リザルトの表示
+void Scene::ResultScene()
+{
+	//要素の削除
+	objects.clear();
+
+	//フレームカウントの加算
+	image_count++;
+
+	if (image_count >= 250)
+	{
+		if (object_score <= 500)
+		{
+			//スコアが500以下でBADを表示
+			image = scene_image[3];
+		}
+		else if (object_score <= 1000)
+		{
+			//スコアが1000以下500以上でOKを表示
+			image = scene_image[6];
+		}
+		else if (object_score <= 1500)
+		{
+			//スコアが1500以下1000以上でGOODを表示
+			image = scene_image[5];
+		}
+		else
+		{
+			//スコアが1500以上でPerfectを表示
+			image = scene_image[7];
+		}
+		//0に戻す
+		image_count = 0;
 	}
 }
 

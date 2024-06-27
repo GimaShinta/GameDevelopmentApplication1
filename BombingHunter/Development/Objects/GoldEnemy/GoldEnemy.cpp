@@ -7,6 +7,7 @@
 
 GoldEnemy::GoldEnemy() :animation_count(0)
 {
+	//初期化
 	for (int i = 0; i < 5; i++)
 	{
 		animation[i] = NULL;
@@ -32,7 +33,7 @@ void GoldEnemy::Initialize()
 	{
 		if (animation[i] == -1)
 		{
-			throw("ゴールドエネミーの画像がありません\n");
+			throw("キンテキの画像がありません\n");
 		}
 	}
 
@@ -58,13 +59,48 @@ void GoldEnemy::Update()
 
 	//アニメーション制御
 	AnimationControl();
+
+	//消えるときのアニメーションを行う
+	if (animation_flag == TRUE)
+	{
+		//透明度を上げる
+		anim_a += anim_b;
+
+		//カウント加算
+		a_count++;
+		if (a_count >= 15)
+		{
+			//a_countが15になったら1ずつ加算
+			b_count += 1;
+			//奇数であれば
+			if (b_count % 2 == 0)
+			{
+				location.x += -20;
+			}
+			//偶数であれば
+			else
+			{
+				location.x += 20;
+			}
+			//カウントリセット
+			a_count = 0;
+		}
+		//完全に透明になったら削除
+		if (anim_a <= 0)
+		{
+			//削除フラグ
+			delete_flag = TRUE;
+		}
+	}
 }
 
 //描画処理
 void GoldEnemy::Draw() const
 {
-	//情報を基にハコテキ画像を描画する
+	//情報を基にキンテキ画像を描画する
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, anim_a);
 	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	//親クラスの描画処理を呼び出す
 	__super::Draw();
@@ -87,16 +123,11 @@ void GoldEnemy::OnHitCollision(GameObject* hit_object)
 	//ヒット時通知
 	if (dynamic_cast<Bomb*>(hit_object) != nullptr)
 	{
-		//消す
-		delete_flag = TRUE;
+		//消える
+		animation_flag = TRUE;
 
 		//スコア
-		score += 1500;
-	}
-	else
-	{
-		//消さない
-		delete_flag = FALSE;
+		score = 1500;
 	}
 }
 
@@ -112,6 +143,19 @@ void GoldEnemy::Movement()
 	else
 	{
 		direction.x = -2;
+	}
+
+	//消えるとき動きを止める
+	if (animation_flag == TRUE)
+	{
+		direction = 0;
+	}
+
+	//画面外で削除
+	if (location.x < 0 || location.x>640)
+	{
+		//削除フラグ
+		delete_flag = TRUE;
 	}
 
 	//進行方向に向かって、位置座標を変更する
@@ -151,6 +195,5 @@ void GoldEnemy::AnimationControl()
 		{
 			image = animation[1];
 		}
-
 	}
 }

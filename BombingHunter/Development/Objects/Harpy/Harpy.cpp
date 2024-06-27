@@ -7,6 +7,7 @@
 
 Harpy::Harpy() :animation_count(0)
 {
+	//初期化
 	animation[0] = NULL;
 	animation[1] = NULL;
 }
@@ -32,7 +33,7 @@ void Harpy::Initialize()
 	radian = 0.0f;
 
 	//大きさの設定
-	box_size = 64.0f;
+	box_size = (64.0f / 5) * 4;
 
 	//初期画像の設定
 	image = animation[0];
@@ -46,18 +47,51 @@ void Harpy::Update()
 {
 	//移動処理
 	Movement();
+
 	//アニメーション制御
 	AnimationControl();
 
-	// アルファ値を変化
-	a += b;
+
+	//消えるときのアニメーションを行う
+	if (animation_flag==TRUE)
+	{
+		//透明度を上げる
+		anim_a += anim_b;
+
+		//カウント加算
+		a_count++;
+		if (a_count >= 15)
+		{
+			//a_countが15になったら1ずつ加算
+			b_count += 1;
+			//奇数であれば
+			if (b_count % 2 == 0)
+			{
+				location.x += -20;
+			}
+			//偶数であれば
+			else
+			{
+				location.x += 20;
+			}
+			//カウントリセット
+			a_count = 0;
+		}
+		//完全に透明になったら削除
+		if (anim_a <= 0)
+		{
+			//削除フラグ
+			delete_flag = TRUE;
+		}
+	}
 }
 
 //描画処理
 void Harpy::Draw() const
 {
 	//情報を基にハーピー画像を描画する
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, a);
+	//anim_aで透明度を上げる
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, anim_a);
 	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
@@ -80,16 +114,11 @@ void Harpy::OnHitCollision(GameObject* hit_object)
 	//ヒット時処理
 	if (dynamic_cast<Bomb*>(hit_object) != nullptr)
 	{
-		//消す
-		delete_flag = TRUE;
+		//消える
+		animation_flag = TRUE;
 
 		//スコア
-		score += -100;
-	}
-	else
-	{
-		//消さない
-		delete_flag = FALSE;
+		score = -100;
 	}
 }
 
@@ -107,6 +136,19 @@ void Harpy::Movement()
 		direction.x = -1;
 	}
 
+	//消えるとき動きを止める
+	if (animation_flag == TRUE)
+	{
+		direction = 0;
+	}
+
+	//画面外で削除
+	if (location.x < 0 || location.x>640)
+	{
+		//削除フラグ
+		delete_flag = TRUE;
+	}
+
 	//進行方向に向かって、位置座標を変更する
 	location += direction;
 }
@@ -116,7 +158,6 @@ void Harpy::AnimationControl()
 {
 	//フレームカウントを加算する
 	animation_count++;
-
 	//60フレーム目に到達したら
 	if (animation_count >= 60)
 	{

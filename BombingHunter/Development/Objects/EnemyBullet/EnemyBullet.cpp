@@ -7,6 +7,7 @@
 
 EnemyBullet::EnemyBullet() :animation_count(0)
 {
+	//初期化
 	for (int i = 0; i < 4; i++)
 	{
 		animation[i] = NULL;
@@ -55,6 +56,7 @@ void EnemyBullet::Update()
 	//移動処理
 	Movement();
 
+	//消えるときアニメーションを行う
 	if (animation_flag == TRUE)
 	{
 		//アニメーション制御
@@ -76,10 +78,10 @@ void EnemyBullet::Draw() const
 void EnemyBullet::Finalize()
 {
 	//使用した画像を解放する
-	DeleteGraph(animation[0]);
-	DeleteGraph(animation[1]);
-	DeleteGraph(animation[2]);
-	DeleteGraph(animation[3]);
+	for (int i = 0; i < 4; i++)
+	{
+		DeleteGraph(animation[i]);
+	}
 }
 
 //当たり判定通知処理
@@ -89,27 +91,31 @@ void EnemyBullet::OnHitCollision(GameObject* hit_object)
 	//ヒット時通知
 	if (dynamic_cast<Player*>(hit_object) != nullptr)
 	{
-		//消す（アニメーション可能）
+		//消える
 		animation_flag = TRUE;
 
 		//スコア
-		score += -100;
-	}
-	else
-	{
-		//消さない
-		animation_flag = FALSE;
+		score = -100;
 	}
 }
 
 //移動処理
 void EnemyBullet::Movement()
 {
-	//進行方向に向かって、位置座標を変更する
+	//消えるとき動きを止める
 	if (animation_flag == TRUE)
 	{
 		direction = 0;
 	}
+
+	//画面外で削除
+	if (location.x < 0 || location.x>640 || location.y < 0)
+	{
+		//削除フラグ
+		delete_flag = TRUE;
+	}
+
+	//進行方向に向かって、位置座標を変更する
 	location += direction;
 }
 
@@ -140,7 +146,7 @@ void EnemyBullet::AnimationControl()
 		}
 		else
 		{
-			//消す
+			//削除フラグ
 			delete_flag = TRUE;
 		}
 	}

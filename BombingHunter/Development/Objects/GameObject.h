@@ -7,17 +7,17 @@
 //ゲームオブジェクト基底クラス
 class GameObject
 {
-public:
-	int a;
-	int b;
-
 protected:
 	Vector2D location;           //位置情報
 	Vector2D box_size;           //大きさ
-	Vector2D direction;
+	Vector2D direction;          //進行方向
 	double radian;               //向き
-	double image_size;
-	int score;
+	double image_size;           //画像サイズ
+	int anim_a;                  //透明度アニメーション変数
+	int anim_b;                  //透明度アニメーション加算用変数
+	int a_count;                 //
+	int b_count;                 //
+	int score;                   //スコア
 	int image;                   //描画する画像
 	int sound;                   //再生する音源
 	bool delete_flag;            //削除フラグ

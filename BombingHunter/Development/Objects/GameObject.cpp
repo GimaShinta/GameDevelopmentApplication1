@@ -13,8 +13,10 @@ GameObject::GameObject() :
 	flip_flag(FALSE),
 	animation_flag(FALSE),
 	score(0),
-	a(255),
-	b(-1)
+	anim_a(255),
+	anim_b(-5),
+	a_count(0),
+	b_count(0)
 {
 }
 
@@ -39,7 +41,7 @@ void GameObject::Update()
 //•`‰æˆ—
 void GameObject::Draw() const
 {
-
+	//“–‚½‚è”»’è‚Ì‰Â‹‰»
 	Vector2D t1 = location - (box_size / 2.0f);
 	Vector2D br = location + (box_size / 2.0f);
 

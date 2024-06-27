@@ -8,6 +8,7 @@
 
 Bomb::Bomb() :animation_count(0)
 {
+	//初期化
 	for (int i = 0; i < 4; i++)
 	{
 		animation[i] = NULL;
@@ -47,7 +48,7 @@ void Bomb::Initialize()
 	image = animation[0];
 
 	//初期進行方向の設定
-	direction = Vector2D(0.0f, 1.0f);
+	direction = Vector2D(0.0f, 1.3f);
 }
 
 //更新処理
@@ -56,6 +57,7 @@ void Bomb::Update()
 	//移動処理
 	Movement();
 
+	//消えるときアニメーションを行う
 	if (animation_flag == TRUE)
 	{
 		//アニメーション制御
@@ -67,7 +69,7 @@ void Bomb::Update()
 void Bomb::Draw() const
 {	
 	//情報を基に爆弾の画像を描画する
-	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, flip_flag);
+	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 
 	//親クラスの描画処理を呼び出す
 	__super::Draw();
@@ -90,16 +92,22 @@ void Bomb::OnHitCollision(GameObject* hit_object)
 	//ヒット時通知
 	if (dynamic_cast<Player*>(hit_object) != nullptr)
 	{
-		//消さない
+		//消えない
 		animation_flag = FALSE;
 	}
 	else if (dynamic_cast<EnemyBullet*>(hit_object) != nullptr)
 	{
-		//消さない
+		//消えない
+		animation_flag = FALSE;
+	}
+	else if (dynamic_cast<Bomb*>(hit_object) != nullptr)
+	{
+		//消えない
 		animation_flag = FALSE;
 	}
 	else
 	{
+		//消える
 		animation_flag = TRUE;
 	}
 }
@@ -107,21 +115,26 @@ void Bomb::OnHitCollision(GameObject* hit_object)
 //移動処理
 void Bomb::Movement()
 {
-	//direction.x = 1.0f;
-	//direction.y += 0.01f;
-	//radian += 0.005;
-	//進行方向に向かって、位置座標を変更する
+	//消えるとき動きを止める
 	if (animation_flag == TRUE)
 	{
 		direction = 0;
 	}
+
+	//画面外に行ったら削除
+	if (location.y > 480)
+	{
+		//削除フラグ
+		delete_flag = TRUE;
+	}
+
+	//進行方向に向かって、位置座標を変更する
 	location += direction;
 }
 
 //アニメーション制御
 void Bomb::AnimationControl()
 {
-	direction = 0;
 	//フレームカウントを加算する
 	animation_count++;
     //60フレーム目に到達したら
@@ -145,7 +158,7 @@ void Bomb::AnimationControl()
 		}
 		else
 		{
-			//消す
+			//削除フラグ
 			delete_flag = TRUE;
 		}
 	}
