@@ -16,8 +16,8 @@ private:
 	int object_score;            //スコア結果
 	int gametime;                // 時間制限
 	int ctime_count;             //一定時間
-	int image_count;
-	int image;
+	int image_count;             //フレームレートカウント
+	int image;                   //描画する画像
 	int scene_image[8];          //UI画像
 	int number_animation[10];    //数字画像
 	bool b_flag;                 //爆弾生成フラグ
@@ -34,9 +34,9 @@ public:
 	void Draw() const;
 	void Finalize();
 	void RandamCreate();          //ランダムに敵を生成する
-	void DeleteObject();             //オブジェクトの削除
+	void DeleteObject();          //オブジェクトを削除する
 	void BombCreate();            //爆弾を生成する
-	void ResultScene();
+	void ResultScene();           //リザルト結果を表示する
 
 private:
 	//当たり判定チェック処理

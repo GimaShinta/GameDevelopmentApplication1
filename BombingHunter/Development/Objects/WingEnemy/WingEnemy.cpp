@@ -160,8 +160,8 @@ void WingEnemy::Movement()
 	//画面外で削除
 	if (location.x < 0 || location.x>640)
 	{
-		//削除フラグ
-		delete_flag = TRUE;
+		//画面外フラグ
+		out_flag = TRUE;
 	}
 
 	//進行方向に向かって、位置座標を変更する

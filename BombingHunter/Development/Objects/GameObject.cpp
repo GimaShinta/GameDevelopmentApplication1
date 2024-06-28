@@ -12,6 +12,7 @@ GameObject::GameObject() :
 	delete_flag(FALSE),
 	flip_flag(FALSE),
 	animation_flag(FALSE),
+	out_flag(FALSE),
 	score(0),
 	anim_a(255),
 	anim_b(-5),
@@ -58,6 +59,11 @@ void GameObject::Finalize()
 bool GameObject::GetDeleteFlag()
 {
 	return this->delete_flag;
+}
+
+bool GameObject::GetOutDeleteFlag()
+{
+	return this->out_flag;
 }
 
 //“–‚½‚è”»’è’Ê’mˆ—

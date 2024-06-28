@@ -64,12 +64,12 @@ void Harpy::Update()
 		{
 			//a_countが15になったら1ずつ加算
 			b_count += 1;
-			//奇数であれば
+			//偶数であれば
 			if (b_count % 2 == 0)
 			{
 				location.x += -20;
 			}
-			//偶数であれば
+			//奇数であれば
 			else
 			{
 				location.x += 20;
@@ -145,8 +145,8 @@ void Harpy::Movement()
 	//画面外で削除
 	if (location.x < 0 || location.x>640)
 	{
-		//削除フラグ
-		delete_flag = TRUE;
+		//画面外フラグ
+		out_flag = TRUE;
 	}
 
 	//進行方向に向かって、位置座標を変更する

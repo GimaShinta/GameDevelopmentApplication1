@@ -143,13 +143,22 @@ void Scene::Draw() const
 	DrawRotaGraphF(20, 460, 0.5, 0.0, scene_image[0], TRUE, FALSE);
 	//スコア表示
 	DrawGraph(130, 450, scene_image[1],FALSE);
-	DrawGraph(300, 450, scene_image[2],FALSE);
-	DrawFormatString(200, 450, f_color, "%d", object_score);
+	DrawGraph(200, 450, number_animation[object_score / 1000], FALSE);
+	DrawGraph(220, 450, number_animation[(object_score % 1000 ) /100], FALSE);
+	DrawGraph(240, 450, number_animation[(object_score % 1000 % 100) / 10], FALSE);
+	DrawGraph(260, 450, number_animation[(object_score % 1000 % 100) % 10], FALSE);
+	//ハイスコア
+	DrawGraph(420, 450, scene_image[2],FALSE);
+	DrawGraph(520, 450, number_animation[7],FALSE);
+	DrawGraph(540, 450, number_animation[7],FALSE);
+	DrawGraph(560, 450, number_animation[7],FALSE);
+	DrawGraph(580, 450, number_animation[7],FALSE);
+	DrawGraph(600, 450, number_animation[7],FALSE);
 
 	//時間経過でFinishを表示
 	if (gametime <= 0)
 	{
-		DrawRotaGraphF(300, 200, 0.5, 0.0, image, TRUE, FALSE);
+		DrawRotaGraphF(330, 200, 0.5, 0.0, image, TRUE, FALSE);
 	}
 
 	//シーンに存在するオブジェクトの描画処理
@@ -232,8 +241,11 @@ void Scene::RandamCreate()
 				//テキの位置からプレイヤーへのベクトルを求める
 				Vector2D b = objects[i]->GetLocation() - a->GetLocation();
 				float c = sqrt(pow(b.x, 2) + pow(b.y, 2));
-				//プレイヤーに向かって弾を打つ
-				CreateObject<EnemyBullet>(a->GetLocation())->SetDirection(Vector2D(b.x/c,b.y/c));
+				if (rand() % 10 + 1 <= 5)
+				{
+					//プレイヤーに向かって弾を打つ
+					CreateObject<EnemyBullet>(a->GetLocation())->SetDirection(Vector2D(b.x/c,b.y/c));
+				}
 			}
 		}
 	}
@@ -270,7 +282,7 @@ void Scene::DeleteObject()
 			object_score += objects[i]->GetScore();
 			//オブジェクトを配列から削除
 			this->objects.erase(objects.begin() + i);
-			//爆弾生成可能
+
 			b_flag = FALSE;
 
 			//0以下にはならない
@@ -278,6 +290,17 @@ void Scene::DeleteObject()
 			{
 				object_score = 0;
 			}
+			i--;
+		}
+		if (objects[i]->GetOutDeleteFlag()==TRUE)
+		{
+			if (dynamic_cast<Bomb*>(objects[i]) != nullptr)
+			{
+				//爆弾生成可能
+				b_flag = FALSE;
+			}
+			//オブジェクトを配列から削除
+			this->objects.erase(objects.begin() + i);
 		}
 	}
 }
@@ -314,26 +337,26 @@ void Scene::ResultScene()
 	//フレームカウントの加算
 	image_count++;
 
-	if (image_count >= 250)
+	if (image_count >= 300)
 	{
-		if (object_score <= 500)
+		if (object_score <= 1500)
 		{
-			//スコアが500以下でBADを表示
+			//スコアが1000以下でBADを表示
 			image = scene_image[3];
 		}
-		else if (object_score <= 1000)
+		else if (object_score <= 2000)
 		{
-			//スコアが1000以下500以上でOKを表示
+			//スコアが1500以上2000以下でOKを表示
 			image = scene_image[6];
 		}
-		else if (object_score <= 1500)
+		else if (object_score <= 2500)
 		{
-			//スコアが1500以下1000以上でGOODを表示
+			//スコアが2000以上2500以下でGOODを表示
 			image = scene_image[5];
 		}
 		else
 		{
-			//スコアが1500以上でPerfectを表示
+			//スコアが2500以上でPerfectを表示
 			image = scene_image[7];
 		}
 		//0に戻す

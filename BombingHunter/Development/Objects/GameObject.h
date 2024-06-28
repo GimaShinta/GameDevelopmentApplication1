@@ -15,14 +15,15 @@ protected:
 	double image_size;           //画像サイズ
 	int anim_a;                  //透明度アニメーション変数
 	int anim_b;                  //透明度アニメーション加算用変数
-	int a_count;                 //
-	int b_count;                 //
+	int a_count;                 //アニメーションカウント
+	int b_count;                 //アニメーションカウントの到達回数カウント
 	int score;                   //スコア
 	int image;                   //描画する画像
 	int sound;                   //再生する音源
 	bool delete_flag;            //削除フラグ
 	bool flip_flag;              //反転フラグ
-	bool animation_flag;
+	bool animation_flag;         //アニメーションフラグ
+	bool out_flag;
 
 public:
 	GameObject();
@@ -33,6 +34,7 @@ public:
 	virtual void Draw() const;   //描画処理
 	virtual void Finalize();     //終了時処理
     bool GetDeleteFlag();     //オブジェクト削除処理
+	bool GetOutDeleteFlag();
 
 	//当たり判定通知処理
 	virtual void OnHitCollision(GameObject* hit_object);
