@@ -43,7 +43,7 @@ void WingEnemy::Initialize()
 	radian = 0.0f;
 
 	//‘å‚«‚³‚Ìİ’è
-	box_size = (64.0f / 5) * 4;
+	box_size = (64.0f / 5) * 3;
 
 	//‰Šú‰æ‘œ‚Ìİ’è
 	image = animation[0];
@@ -123,7 +123,6 @@ void WingEnemy::Finalize()
 	DeleteGraph(animation[1]);
 	DeleteGraph(number[0]);
 	DeleteGraph(number[1]);
-	DeleteGraph(number[2]);
 }
 
 //“–‚½‚è”»’è’Ê’mˆ—

@@ -51,7 +51,7 @@ void Harpy::Initialize()
 	radian = 0.0f;
 
 	//‘å‚«‚³‚Ìİ’è
-	box_size = (64.0f / 5) * 4;
+	box_size = (64.0f / 5) * 3;
 
 	//‰Šú‰æ‘œ‚Ìİ’è
 	image = animation[0];

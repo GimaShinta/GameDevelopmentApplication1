@@ -43,7 +43,7 @@ void Bomb::Initialize()
 	radian = 0;
 
 	//大きさの設定
-	box_size = (64.0f/5)*4;
+	box_size = (64.0f/5)*3;
 
 	//初期画像の設定
 	image = animation[0];
@@ -70,7 +70,7 @@ void Bomb::Update()
 void Bomb::Draw() const
 {	
 	//情報を基に爆弾の画像を描画する
-	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
+	DrawRotaGraphF(location.x, location.y, 0.6, radian, image, TRUE, flip_flag);
 
 	//親クラスの描画処理を呼び出す
 	__super::Draw();

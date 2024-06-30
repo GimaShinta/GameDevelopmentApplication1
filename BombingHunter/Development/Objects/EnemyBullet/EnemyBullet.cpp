@@ -56,7 +56,7 @@ void EnemyBullet::Initialize()
 	radian = 0.0f;
 
 	//‘å‚«‚³‚Ìİ’è
-	box_size = (64.0f/3)*2;
+	box_size = (64.0f/5)*2;
 
 	//‰Šú‰æ‘œ‚Ìİ’è
 	image = animation[0];
