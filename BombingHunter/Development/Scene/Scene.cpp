@@ -241,11 +241,8 @@ void Scene::RandamCreate()
 				//テキの位置からプレイヤーへのベクトルを求める
 				Vector2D b = objects[i]->GetLocation() - a->GetLocation();
 				float c = sqrt(pow(b.x, 2) + pow(b.y, 2));
-				if (rand() % 10 + 1 <= 5)
-				{
-					//プレイヤーに向かって弾を打つ
-					CreateObject<EnemyBullet>(a->GetLocation())->SetDirection(Vector2D(b.x/c,b.y/c));
-				}
+				//プレイヤーに向かって弾を打つ
+				CreateObject<EnemyBullet>(a->GetLocation())->SetDirection(Vector2D(b.x/c,b.y/c));
 			}
 		}
 	}
@@ -278,29 +275,21 @@ void Scene::DeleteObject()
 		//オブジェクトのDeleteFlag関数へ
 		if (objects[i]->GetDeleteFlag() == TRUE)
 		{
+			if (dynamic_cast<Bomb*>(objects[i]) != nullptr)
+			{
+				//爆弾生成可能
+				b_flag = FALSE;
+			}
 			//スコアを足して合計する
 			object_score += objects[i]->GetScore();
 			//オブジェクトを配列から削除
 			this->objects.erase(objects.begin() + i);
-
-			b_flag = FALSE;
 
 			//0以下にはならない
 			if (object_score <= 0)
 			{
 				object_score = 0;
 			}
-			i--;
-		}
-		if (objects[i]->GetOutDeleteFlag()==TRUE)
-		{
-			if (dynamic_cast<Bomb*>(objects[i]) != nullptr)
-			{
-				//爆弾生成可能
-				b_flag = FALSE;
-			}
-			//オブジェクトを配列から削除
-			this->objects.erase(objects.begin() + i);
 		}
 	}
 }

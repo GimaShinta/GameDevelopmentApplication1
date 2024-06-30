@@ -10,6 +10,9 @@ BoxEnemy::BoxEnemy():animation_count(0)
 	//初期化
 	animation[0] = NULL;
 	animation[1] = NULL;
+	number[0] = NULL;
+	number[1] = NULL;
+	number[2] = NULL;
 }
 
 BoxEnemy::~BoxEnemy()
@@ -23,10 +26,18 @@ void BoxEnemy::Initialize()
 	animation[0] = LoadGraph("Resource/Images/BoxEnemy/1.png");
 	animation[1] = LoadGraph("Resource/Images/BoxEnemy/2.png");
 
+	number[0]= LoadGraph("Resource/Images/Score/1.png");
+	number[1]= LoadGraph("Resource/Images/Score/0.png");
+	number[2]= LoadGraph("Resource/Images/Score/0.png");
+
 	//エラーチェック
 	if (animation[0] == -1 || animation[1] == -1)
 	{
 		throw("ハコテキの画像がありません\n");
+	}
+	if (number[0] == -1 || number[1] == -1 || number[2] == -1)
+	{
+		throw("数字の画像がありません\n");
 	}
 
 	//向きの設定
@@ -56,29 +67,29 @@ void BoxEnemy::Update()
 	if (animation_flag == TRUE)
 	{
 		//透明度を上げる
-		anim_a += anim_b;
+		transparent += gradually;
 
 		//カウント加算
-		a_count++;
-		if (a_count >= 15)
+		anim_count++;
+		if (anim_count >= 5)
 		{
-			//a_countが15になったら1ずつ加算
-			b_count += 1;
-			//奇数であれば
-			if (b_count % 2 == 0)
-			{
-				location.x += -20;
-			}
+			//anim_countが15になったら1ずつ加算
+			reach_count += 1;
 			//偶数であれば
+			if (reach_count % 2 == 0)
+			{
+				location.x += -5;
+			}
+			//奇数であれば
 			else
 			{
-				location.x += 20;
+				location.x += 5;
 			}
 			//カウントリセット
-			a_count = 0;
+			anim_count = 0;
 		}
 		//完全に透明になったら削除
-		if (anim_a <= 0)
+		if (transparent <= 0)
 		{
 			//削除フラグ
 			delete_flag = TRUE;
@@ -90,8 +101,15 @@ void BoxEnemy::Update()
 void BoxEnemy::Draw() const
 {
 	//情報を基にハコテキ画像を描画する
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, anim_a);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, transparent);
 	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
+	//獲得スコアの表示
+	if (transparent < 255)
+	{
+		DrawRotaGraphF(location.x + 45, location.y - 30, number_size, radian, number[0], TRUE, FALSE);
+		DrawRotaGraphF(location.x + 55, location.y - 30, number_size, radian, number[1], TRUE, FALSE);
+		DrawRotaGraphF(location.x + 65, location.y - 30, number_size, radian, number[2], TRUE, FALSE);
+	}
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	//親クラスの描画処理を呼び出す
@@ -104,6 +122,9 @@ void BoxEnemy::Finalize()
 	//使用した画像を解放する
 	DeleteGraph(animation[0]);
 	DeleteGraph(animation[1]);
+	DeleteGraph(number[0]);
+	DeleteGraph(number[1]);
+	DeleteGraph(number[2]);
 }
 
 //当たり判定通知処理
@@ -144,8 +165,8 @@ void BoxEnemy::Movement()
 	//画面外で削除
 	if (location.x < 0 || location.x>640)
 	{
-		//画面外フラグ
-		out_flag = TRUE;
+		//削除フラグ
+		delete_flag = TRUE;
 	}
 
 	//進行方向に向かって、位置座標を変更する

@@ -7,6 +7,7 @@ class Harpy :public GameObject
 private:
 	int animation[2];
 	int animation_count;
+	int number[4];
 
 public:
 	Harpy();

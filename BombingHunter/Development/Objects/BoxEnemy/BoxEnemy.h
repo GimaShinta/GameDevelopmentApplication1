@@ -6,6 +6,7 @@ class BoxEnemy :public GameObject
 {
 private:
 	int animation[2];
+	int number[3];
 	int animation_count;
 	
 public:

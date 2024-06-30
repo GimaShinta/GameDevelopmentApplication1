@@ -6,6 +6,7 @@ class EnemyBullet :public GameObject
 {
 private:
 	int animation[4];
+	int number[4];
 	int animation_count;
 
 public:

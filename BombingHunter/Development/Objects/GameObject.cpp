@@ -6,18 +6,19 @@ GameObject::GameObject() :
 	location(0.0f),
 	box_size(0.0f),
 	image_size(0.7),
+	number_size(1.0),
 	radian(0.0f),
 	image(NULL),
 	sound(NULL),
 	delete_flag(FALSE),
 	flip_flag(FALSE),
 	animation_flag(FALSE),
-	out_flag(FALSE),
+	anumber_flag(FALSE),
 	score(0),
-	anim_a(255),
-	anim_b(-5),
-	a_count(0),
-	b_count(0)
+	transparent(255),
+	gradually(-5),
+	anim_count(0),
+	reach_count(0)
 {
 }
 
@@ -43,10 +44,10 @@ void GameObject::Update()
 void GameObject::Draw() const
 {
 	//“–‚½‚è”»’è‚Ì‰Â‹‰»
-	Vector2D t1 = location - (box_size / 2.0f);
-	Vector2D br = location + (box_size / 2.0f);
+	//Vector2D t1 = location - (box_size / 2.0f);
+	//Vector2D br = location + (box_size / 2.0f);
 
-	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
+	//DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
 }
 
 //I—¹ˆ—
@@ -59,11 +60,6 @@ void GameObject::Finalize()
 bool GameObject::GetDeleteFlag()
 {
 	return this->delete_flag;
-}
-
-bool GameObject::GetOutDeleteFlag()
-{
-	return this->out_flag;
 }
 
 //“–‚½‚è”»’è’Ê’mˆ—

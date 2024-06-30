@@ -56,15 +56,6 @@ void Player::Draw() const
 	//プレイヤー画像の描画
 	DrawRotaGraph(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 
-	//デバッグ用
-#if _DEBUG
-	//当たり判定の可視化
-	Vector2D t1 = location - (box_size / 2.0f);
-	Vector2D br = location + (box_size / 2.0f);
-
-	DrawBoxAA(t1.x, t1.y, br.x, br.y, GetColor(255, 0, 0), FALSE);
-#endif
-
 	//親クラスの描画処理を呼び出す
 	__super::Draw();
 

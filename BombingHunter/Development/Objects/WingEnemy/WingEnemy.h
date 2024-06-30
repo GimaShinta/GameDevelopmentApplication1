@@ -6,6 +6,7 @@ class WingEnemy :public GameObject
 {
 private:
 	int animation[2];
+	int number[2];
 	int animation_count;
 
 public:

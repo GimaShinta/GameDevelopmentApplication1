@@ -116,9 +116,6 @@ void Bomb::OnHitCollision(GameObject* hit_object)
 //移動処理
 void Bomb::Movement()
 {
-	//location.y = pow(-location.x,2);
-
-
 	//消えるとき動きを止める
 	if (animation_flag == TRUE)
 	{
@@ -128,8 +125,8 @@ void Bomb::Movement()
 	//画面外に行ったら削除
 	if (location.y > 480)
 	{
-		//画面外フラグ
-		out_flag = TRUE;
+		//削除フラグ
+		delete_flag = TRUE;
 	}
 
 	//進行方向に向かって、位置座標を変更する
@@ -142,7 +139,7 @@ void Bomb::AnimationControl()
 	//フレームカウントを加算する
 	animation_count++;
     //60フレーム目に到達したら
-	if (animation_count >= 15)
+	if (animation_count >= 10)
 	{
 		//カウントのリセット
 		animation_count = 0;

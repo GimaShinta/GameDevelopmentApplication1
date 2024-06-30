@@ -7,6 +7,7 @@ class GoldEnemy :public GameObject
 {
 private:
 	int animation[5];
+	int number[4];
 	int animation_count;
 
 public:
