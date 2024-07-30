@@ -85,6 +85,7 @@ void EnemyBullet::Draw() const
 {
 	//情報を基にテキ弾の画像を描画する
 	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
+	//獲得スコアの表示
 	if (animation_flag == TRUE)
 	{
 		DrawRotaGraphF(location.x + 45, location.y - 30, number_size, radian, number[0], TRUE, FALSE);

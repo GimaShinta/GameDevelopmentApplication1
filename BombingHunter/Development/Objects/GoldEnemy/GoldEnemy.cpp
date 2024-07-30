@@ -114,6 +114,7 @@ void GoldEnemy::Update()
 void GoldEnemy::Draw() const
 {
 	//情報を基にキンテキ画像を描画する
+	//transparentの値を減らすと画像の透明度が上がる
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, transparent);
 	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 	//獲得スコアの表示

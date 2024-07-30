@@ -4,6 +4,7 @@
 #include <string>
 #include "../Objects/GameObject.h"
 
+//時間制限の初期値
 #define TIMELIMIT 3000*3
 
 class Scene
@@ -12,7 +13,6 @@ private:
 
 	std::vector<GameObject*>objects;
 
-	int f_color;                 //フォントカラー（黒）
 	int object_score;            //スコア結果
 	int gametime;                // 時間制限
 	int ctime_count;             //一定時間

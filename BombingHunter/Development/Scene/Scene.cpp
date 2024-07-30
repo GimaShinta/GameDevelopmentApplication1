@@ -13,10 +13,10 @@
 //コンストラクタ
 Scene::Scene() :objects(),b_flag(FALSE),object_flip(FALSE),object_score(0),image(NULL),ctime_count(0),image_count(0)
 {
+	//時間制限の設定
 	gametime = TIMELIMIT;
 
-	f_color = GetColor(255, 255, 255);
-
+	//初期化
 	for (int i = 0; i < 10; i++)
 	{
 		number_animation[i] = NULL;
@@ -37,6 +37,7 @@ Scene::~Scene()
 //初期化処理
 void Scene::Initialize()
 {
+	//画像の読み込み
 	number_animation[0] = LoadGraph("Resource/Images/Score/0.png");
 	number_animation[1] = LoadGraph("Resource/Images/Score/1.png");
 	number_animation[2] = LoadGraph("Resource/Images/Score/2.png");
@@ -57,6 +58,7 @@ void Scene::Initialize()
 	scene_image[6] = LoadGraph("Resource/Images/Evaluation/OK.png");
 	scene_image[7] = LoadGraph("Resource/Images/Evaluation/Perfect.png");
 
+	//画像の初期設定
 	image = scene_image[4];
 
 	//エラーチェック
@@ -118,7 +120,7 @@ void Scene::Update()
 	//オブジェクトの削除
 	DeleteObject();
 
-	//時間経過で全オブジェクトの削除
+	//時間経過でリザルトの表示
 	if (gametime <= 0)
 	{
 		ResultScene();

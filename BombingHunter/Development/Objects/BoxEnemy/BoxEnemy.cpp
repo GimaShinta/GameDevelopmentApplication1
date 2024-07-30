@@ -101,6 +101,7 @@ void BoxEnemy::Update()
 void BoxEnemy::Draw() const
 {
 	//情報を基にハコテキ画像を描画する
+	//tranparentの値を減らして透明にする
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, transparent);
 	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 	//獲得スコアの表示

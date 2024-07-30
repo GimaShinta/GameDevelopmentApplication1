@@ -13,7 +13,6 @@ GameObject::GameObject() :
 	delete_flag(FALSE),
 	flip_flag(FALSE),
 	animation_flag(FALSE),
-	anumber_flag(FALSE),
 	score(0),
 	transparent(255),
 	gradually(-5),

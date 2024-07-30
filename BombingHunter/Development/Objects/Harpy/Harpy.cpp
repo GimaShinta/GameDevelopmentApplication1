@@ -108,7 +108,7 @@ void Harpy::Update()
 void Harpy::Draw() const
 {
 	//情報を基にハーピー画像を描画する
-	//anim_aで透明度を上げる
+	//transparentの値を減らして徐々に透明にする
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, transparent);
 	DrawRotaGraphF(location.x, location.y, image_size, radian, image, TRUE, flip_flag);
 	//獲得スコアの表示

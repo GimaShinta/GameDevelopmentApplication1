@@ -13,7 +13,7 @@ protected:
 	Vector2D direction;          //進行方向
 	double radian;               //向き
 	double image_size;           //画像サイズ
-	double number_size;
+	double number_size;          //数字画像サイズ
 	int transparent;             //透明度アニメーション変数
 	int gradually;               //透明度アニメーション加算用変数
 	int anim_count;              //アニメーションカウント
@@ -24,7 +24,6 @@ protected:
 	bool delete_flag;            //削除フラグ
 	bool flip_flag;              //反転フラグ
 	bool animation_flag;         //アニメーションフラグ
-	bool anumber_flag;
 
 public:
 	GameObject();
