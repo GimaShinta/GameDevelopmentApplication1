@@ -3,11 +3,10 @@
 #include "../../Utility/ResourceManager.h"
 #include "DxLib.h"
 
-#define D_ENEMY_SPEED (50.0f)
+#define D_ENEMY_SPEED (50.0f / enemy_speed)
 #define D_IZIKE_TIME (12.0f)
 
 EnemyBase::EnemyBase():
-	velocity(0.0f),
 	direction(0.0f),
 	enemy_state(eEnemyState::TERRITORY),
 	now_direction(eEnemyDirectionState::UP),
@@ -16,13 +15,13 @@ EnemyBase::EnemyBase():
 	animation_time(0.0f),
 	izike_time(0.0f),
 	track_time(0.0f),
+	enemy_speed(0.0f),
 	animation_count(0),
-	izike_animcount(0),
-	izike_reachcount(0),
 	eye(NULL),
 	in_tunnel(false),
 	izike(false),
-	izike_endanim(false)
+	player_powerd(false),
+	end_anim(false)
 {
 }
 
@@ -56,9 +55,13 @@ void EnemyBase::Initialize()
 	//エネミー状態の設定
 	enemy_state = eEnemyState::TRACK;
 
-	//速度設定
-	velocity = Vector2D(2.5f, 0.0f);
+	//進行方向設定
+	direction = Vector2D(2.5f, 0.0f);
 
+	//速度設定
+	enemy_speed = 1;
+
+	//イジケ時間を設定
 	izike_time = D_IZIKE_TIME;
 }
 
@@ -69,6 +72,7 @@ void EnemyBase::Update(float delta_second)
 	switch (enemy_state)
 	{
 	case eEnemyState::IZIKE:
+		enemy_speed = 2;
 		MovementBase(delta_second);
 		// 移動中のアニメーション
 		animation_time += delta_second;
@@ -77,7 +81,8 @@ void EnemyBase::Update(float delta_second)
 			animation_time = 0.0f;
 			animation_count++;
 
-			if (izike_endanim == false)
+			//アニメーションフラグ
+			if (end_anim == false)
 			{
 				if (animation_count >= 2)
 				{
@@ -98,6 +103,7 @@ void EnemyBase::Update(float delta_second)
 		}
 		break;
 	case eEnemyState::EYE:
+		enemy_speed = 0.5;
 		MovementBase(delta_second);
 		AnimationBase(delta_second);
 		break;
@@ -115,7 +121,7 @@ void EnemyBase::Update(float delta_second)
 		if (izike_time <= 3)
 		{
 			//アニメーションを変化させる
-			izike_endanim = true;
+			end_anim = true;
 		}
 		//イジケ時間が０秒以下になったら
 		if (izike_time <= 0)
@@ -124,14 +130,25 @@ void EnemyBase::Update(float delta_second)
 			enemy_state = eEnemyState::TRACK;
 			//イジケ状態を解除
 			izike = false;
+			//プレイヤーパワーダウンフラグ
+			player_powerd = true;
 		}
 	}
 	//イジケ状態じゃなかったら
 	else
 	{
 		//値の再初期化
-		izike_endanim = false;
+		end_anim = false;
+		player_powerd = false;
 		izike_time = D_IZIKE_TIME;
+	}
+
+	// 入力状態の取得
+	InputManager* input = InputManager::GetInstance();
+
+	if (input->GetKeyDown(KEY_INPUT_B) && enemy_state == eEnemyState::EYE)
+	{
+		enemy_state = eEnemyState::TRACK;
 	}
 }
 
@@ -157,6 +174,7 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 //終了時処理
 void EnemyBase::Finalize()
 {
+	eye_animation.clear();
 }
 
 //ヒット時処理
@@ -184,7 +202,7 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 		location += dv.Normalize() * diff;
 
 		//壁に当たったら反転
-		velocity *= -1;
+		direction *= -1;
 	}
 
 	//イジケ状態のままプレイヤーと当たったら
@@ -203,10 +221,10 @@ eEnemyState EnemyBase::GetEnemyState() const
 	return enemy_state;
 }
 
-//イジケ時間を取得
-float EnemyBase::GetIzikeTime() const
+//プレイヤーパワーダウンフラグを取得
+bool EnemyBase::GetPlayerDown() const
 {
-	return izike_time;
+	return player_powerd;
 }
 
 //進行方向の設定
@@ -224,22 +242,22 @@ void EnemyBase::SetIzikeState()
 //共通移動処理
 void EnemyBase::MovementBase(float delta_second)
 {
-	location += velocity * D_ENEMY_SPEED * delta_second;
+	location += direction * D_ENEMY_SPEED * delta_second;
 
 	//進行方向によって進行方向状態を変更する
-	if (velocity.x > 0)
+	if (direction.x > 0)
 	{
 		now_direction = eEnemyDirectionState::RIGHT;
 	}
-	else if (velocity.x < 0)
+	else if (direction.x < 0)
 	{
 		now_direction = eEnemyDirectionState::LEFT;
 	}
-	else if (velocity.y < 0)
+	else if (direction.y < 0)
 	{
 		now_direction = eEnemyDirectionState::UP;
 	}
-	else if (velocity.y > 0)
+	else if (direction.y > 0)
 	{
 		now_direction = eEnemyDirectionState::DOWN;
 	}

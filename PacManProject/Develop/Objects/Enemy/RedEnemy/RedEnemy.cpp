@@ -32,10 +32,12 @@ void RedEnemy::Update(float delta_second)
 	switch (enemy_state)
 	{
 		case eEnemyState::TRACK:
+			enemy_speed = 1;
 			Movement(delta_second);
 			AnimationControl(delta_second);
 			break;
 		case eEnemyState::TERRITORY:
+			enemy_speed = 1;
 			Movement(delta_second);
 			AnimationControl(delta_second);
 			break;
@@ -52,8 +54,8 @@ void RedEnemy::Draw(const Vector2D& screen_offset) const
 //I—¹ˆ—
 void RedEnemy::Finalize()
 {
+	__super::Finalize();
 	move_animation.clear();
-	eye_animation.clear();
 }
 
 //ˆÚ“®ˆ—

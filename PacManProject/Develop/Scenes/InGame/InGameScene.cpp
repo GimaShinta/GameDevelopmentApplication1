@@ -88,8 +88,8 @@ eSceneType InGameScene::Update(const float& delta_second)
 			now_izike = false;
 		}
 
-		//イジケ時間が０秒以下になったとき
-		if (red->GetIzikeTime() <= 0)
+		//イジケ終了フラグがtrueになったとき
+		if (red->GetPlayerDown() == true)
 		{
 			//プレイヤーをパワーダウンさせる
 			player->SetPowerDown();
