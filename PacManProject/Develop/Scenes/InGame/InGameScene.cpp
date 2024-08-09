@@ -10,12 +10,13 @@
 #include "DxLib.h"
 #include <fstream>
 
-InGameScene::InGameScene() 
+InGameScene::InGameScene()
 	: player(nullptr)
-	,red(nullptr)
+	, red(nullptr)
 	, back_ground_image(NULL)
 	, back_ground_sound(NULL)
 	, pause_flag(false)
+	, now_izike(false)
 {
 
 }
@@ -69,14 +70,28 @@ eSceneType InGameScene::Update(const float& delta_second)
 			return eSceneType::re_start;
 		}
 
-		//パワー餌を食べたらイジケ状態にする
+		//プレイヤーがパワーアップ状態のとき
 		if (player->GetPowerUp() == true)
 		{
-			red->SetEnemyState();
+			if (now_izike == false)
+			{
+				//イジケにする
+				red->SetIzikeState();
+				//ループを抜ける
+				now_izike = true;
+			}
+		}
+		//プレイヤーがパワーアップ状態ではないとき
+		else
+		{
+			//値の再初期化
+			now_izike = false;
 		}
 
+		//イジケ時間が０秒以下になったとき
 		if (red->GetIzikeTime() <= 0)
 		{
+			//プレイヤーをパワーダウンさせる
 			player->SetPowerDown();
 		}
 	}

@@ -68,23 +68,18 @@ void RedEnemy::AnimationControl(float delta_second)
 {
 	//親クラスの移動処理を呼び出す
 	__super::AnimationBase(delta_second);
-
-	if (enemy_state == TRACK)
+	
+	// 移動中のアニメーション
+	animation_time += delta_second;
+	if (animation_time >= (1.0f / 16.0f))
 	{
-		// 移動中のアニメーション
-		animation_time += delta_second;
-		if (animation_time >= (1.0f / 16.0f))
+		animation_time = 0.0f;
+		animation_count++;
+		if (animation_count >= 2)
 		{
-			animation_time = 0.0f;
-			// 画像の設定
-			if (image == move_animation[0])
-			{
-				image = move_animation[1];
-			}
-			else
-			{
-				image = move_animation[0];
-			}
+			animation_count = 0;
 		}
+		// 画像の設定
+		image = move_animation[move_order[animation_count]];
 	}
 }

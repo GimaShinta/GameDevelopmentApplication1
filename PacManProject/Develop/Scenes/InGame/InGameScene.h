@@ -10,6 +10,7 @@ private:
 	int back_ground_image;		// 背景画像
 	int back_ground_sound;		// BGM
 	bool pause_flag;			// 一時停止フラグ
+	bool now_izike;
 
 public:
 	InGameScene();

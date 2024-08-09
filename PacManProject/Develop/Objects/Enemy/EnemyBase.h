@@ -54,6 +54,11 @@ protected:
 protected:
 	bool in_tunnel;                          //トンネルに入っているか
 	bool izike;
+	bool izike_endanim;
+
+	const int move_order[2] = { 0, 1 };
+	const int izike_order[2] = { 16, 17 };
+	const int izikeend_order[4] = { 16, 17, 18, 19 };
 
 public:
 	EnemyBase();
@@ -72,7 +77,7 @@ public:
 
 public:
 	void SetDirection(const Vector2D& direction);
-	void SetEnemyState();
+	void SetIzikeState();
 	void MovementBase(float delta_second);
 	void AnimationBase(float delta_second);
 };

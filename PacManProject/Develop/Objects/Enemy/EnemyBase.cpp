@@ -4,6 +4,7 @@
 #include "DxLib.h"
 
 #define D_ENEMY_SPEED (50.0f)
+#define D_IZIKE_TIME (12.0f)
 
 EnemyBase::EnemyBase():
 	velocity(0.0f),
@@ -13,14 +14,15 @@ EnemyBase::EnemyBase():
 	old_direction(eEnemyDirectionState::UP),
 	old_panel(ePanelID::NONE),
 	animation_time(0.0f),
-	izike_time(8.0f),
+	izike_time(0.0f),
 	track_time(0.0f),
 	animation_count(0),
 	izike_animcount(0),
 	izike_reachcount(0),
 	eye(NULL),
 	in_tunnel(false),
-	izike(false)
+	izike(false),
+	izike_endanim(false)
 {
 }
 
@@ -56,6 +58,8 @@ void EnemyBase::Initialize()
 
 	//速度設定
 	velocity = Vector2D(2.5f, 0.0f);
+
+	izike_time = D_IZIKE_TIME;
 }
 
 //更新処理
@@ -71,14 +75,25 @@ void EnemyBase::Update(float delta_second)
 		if (animation_time >= (1.0f / 16.0f))
 		{
 			animation_time = 0.0f;
-			// 画像の設定
-			if (image != move_animation[17])
+			animation_count++;
+
+			if (izike_endanim == false)
 			{
-				image = move_animation[17];
+				if (animation_count >= 2)
+				{
+					animation_count = 0;
+				}
+				// 画像の設定
+				image = move_animation[izike_order[animation_count]];
 			}
-			else if (image == move_animation[17])
+			else
 			{
-				image = move_animation[16];
+				if (animation_count >= 4)
+				{
+					animation_count = 0;
+				}
+				// 画像の設定
+				image = move_animation[izikeend_order[animation_count]];
 			}
 		}
 		break;
@@ -88,34 +103,35 @@ void EnemyBase::Update(float delta_second)
 		break;
 	}
 
-	//イジケ状態かつ目の状態では無かったら
-	if (izike == true && enemy_state != eEnemyState::EYE)
+	//イジケ状態だったら
+	if (izike == true)
 	{
+		//イジケにする
 		enemy_state = eEnemyState::IZIKE;
-		//カウントを減らす
+		//イジケ時間を減らす
 		izike_time -= delta_second;
-	}
 
-	if (izike_time <= 2)
-	{
-		if (animation_time >= (1.0f / 4.0f))
+		//イジケ時間が３秒以下になったら
+		if (izike_time <= 3)
 		{
-			animation_time = 0.0f;
-			// 画像の設定
-			if (image != move_animation[18])
-			{
-				image = move_animation[18];
-			}
-			else if (image == move_animation[18])
-			{
-				image = move_animation[19];
-			}
+			//アニメーションを変化させる
+			izike_endanim = true;
+		}
+		//イジケ時間が０秒以下になったら
+		if (izike_time <= 0)
+		{
+			//追跡状態に戻す
+			enemy_state = eEnemyState::TRACK;
+			//イジケ状態を解除
+			izike = false;
 		}
 	}
-	else if (izike_time <= 0)
+	//イジケ状態じゃなかったら
+	else
 	{
-		izike_time = 8;
-		izike = false;
+		//値の再初期化
+		izike_endanim = false;
+		izike_time = D_IZIKE_TIME;
 	}
 }
 
@@ -172,8 +188,11 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 	}
 
 	//イジケ状態のままプレイヤーと当たったら
-	if (hit_object->GetCollision().object_type == eObjectType::player&&enemy_state==eEnemyState::IZIKE)
+	if (hit_object->GetCollision().object_type == eObjectType::player && enemy_state==eEnemyState::IZIKE)
 	{
+		//イジケ状態を解除
+		izike = false;
+		//目の状態にする
 		enemy_state = eEnemyState::EYE;
 	}
 }
@@ -184,6 +203,7 @@ eEnemyState EnemyBase::GetEnemyState() const
 	return enemy_state;
 }
 
+//イジケ時間を取得
 float EnemyBase::GetIzikeTime() const
 {
 	return izike_time;
@@ -195,8 +215,8 @@ void EnemyBase::SetDirection(const Vector2D& direction)
 	this->direction = direction;
 }
 
-//イジケ状態にする
-void EnemyBase::SetEnemyState()
+//イジケ状態フラグをオン
+void EnemyBase::SetIzikeState()
 {
 	izike = true;
 }
