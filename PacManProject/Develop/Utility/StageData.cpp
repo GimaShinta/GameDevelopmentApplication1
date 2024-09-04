@@ -37,7 +37,7 @@ void StageData::Load()
 	while(std::getline(ifs, line))
 	{
 		// １行読み込んだデータをストリングストリームに変換
-		std::stringstream line_stream = std::stringstream(line);
+		std::stringstream line_stream = std::stringstream(line);	
 
 		// 符号を取得
 		std::string mode;

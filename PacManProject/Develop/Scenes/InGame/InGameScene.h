@@ -6,6 +6,9 @@ class InGameScene : public SceneBase
 {
 private:
 	class RedEnemy* red;
+	class PinkEnemy* pink;
+	class BlueEnemy* blue;
+	class YelloEnemy* yello;
 	class Player* player;		// プレイヤー情報
 	int back_ground_image;		// 背景画像
 	int back_ground_sound;		// BGM

@@ -1,5 +1,8 @@
 ﻿#include "InGameScene.h"
 #include "../../Objects/Enemy/RedEnemy/RedEnemy.h"
+#include "../../Objects/Enemy/PinkEnemy/PinkEnemy.h"
+#include "../../Objects/Enemy/BlueEnemy/BlueEnemy.h"
+#include "../../Objects/Enemy/YelloEnemy/YelloEnemy.h"
 #include "../../Objects/Player/Player.h"
 #include "../../Objects/Enemy/EnemyBase.h"
 #include "../../Objects/Wall/Wall.h"
@@ -7,12 +10,16 @@
 #include "../../Objects/Food/PowerFood.h"
 #include "../../Utility/InputManager.h"
 #include "../../Utility/ResourceManager.h"
+#include "../../Utility/StageData.h"
 #include "DxLib.h"
 #include <fstream>
 
 InGameScene::InGameScene()
 	: player(nullptr)
 	, red(nullptr)
+	, pink(nullptr)
+	, blue(nullptr)
+	, yello(nullptr)
 	, back_ground_image(NULL)
 	, back_ground_sound(NULL)
 	, pause_flag(false)
@@ -77,6 +84,9 @@ eSceneType InGameScene::Update(const float& delta_second)
 			{
 				//イジケにする
 				red->SetIzikeState();
+				pink->SetIzikeState();
+				blue->SetIzikeState();
+				yello->SetIzikeState();
 				//ループを抜ける
 				now_izike = true;
 			}
@@ -84,7 +94,7 @@ eSceneType InGameScene::Update(const float& delta_second)
 		//プレイヤーがパワーアップ状態ではないとき
 		else
 		{
-			//値の再初期化
+			//値のリセット
 			now_izike = false;
 		}
 
@@ -95,6 +105,44 @@ eSceneType InGameScene::Update(const float& delta_second)
 			player->SetPowerDown();
 		}
 	}
+
+
+	//オブジェクトのパネル情報
+	//ePanelID p_panel = player->GetPPanel();
+	//ePanelID e_panel = red->GetEPanel();
+
+	if (red->GetEnemyState() == eEnemyState::TRACK)
+	{
+		//Vector2D p = player->GetLocation();
+		//Vector2D o = red->GetLocation();
+
+		//int t = Vector2D::Saitankyori(player->GetLocation(), red->GetLocation());
+		//red->SetSDistance(t);
+		//printf("%d", t);
+
+
+		//int a, b;
+		//StageData::ConvertToIndex(player->GetLocation(), a, b);
+		//int c, d;
+		//StageData::ConvertToIndex(red->GetLocation(), c, d);
+		//int e = ((abs(a - c) + abs(b - d)));
+		//red->SetSDistance(e);
+		//printf("%d", e);
+
+		//int e, f;
+		//Vector2D h = Vector2D::Panel(player->GetLocation(),red->GetLocation());
+		//StageData::ConvertToIndex(h,e,f);
+		
+		//red->SetDirection((abs(i + j)));
+	}
+
+
+	//if (red->GetEnemyState() == eEnemyState::TRACK)
+	//{
+	//	Vector2D b = player->GetLocation() - red->GetLocation();
+	//	float c = sqrt(pow(b.x, 2) + pow(b.y, 2));
+	//	red->SetDirection(Vector2D(b.x / c, b.y / c));
+	//}
 
 	// シーン情報を返却する
 	return GetNowSceneType();
@@ -216,10 +264,24 @@ void InGameScene::LoadStageMapCSV()
 			case 'R':
 				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
 				red = CreateObject<RedEnemy>(generate_location);
-				//Vector2D b = player->GetLocation() - red->GetLocation();
-				//float c = sqrt(pow(b.x, 2) + pow(b.y, 2));
-				//red->SetDirection(Vector2D(b.x / c, b.y / c));
+				red->SetPlayerControl(player);
 				break;
+			case 'K':
+				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
+				pink = CreateObject<PinkEnemy>(generate_location);
+				pink->SetPlayerControl(player);
+				break;
+			case 'L':
+				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
+				blue = CreateObject<BlueEnemy>(generate_location);
+				blue->SetPlayerControl(player);
+				break;
+			case 'Y':
+				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
+				yello = CreateObject<YelloEnemy>(generate_location);
+				yello->SetPlayerControl(player);
+				break;
+
 			// 上記以外
 			//case 'B':
 			//	generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);

@@ -4,7 +4,7 @@
 #include "DxLib.h"
 #include "../Food/Food.h"
 
-#define D_PLAYER_SPEED	(50.0f)
+#define D_PLAYER_SPEED	(50.0f * player_speed)
 
 Player::Player() :
 	move_animation(),
@@ -17,8 +17,12 @@ Player::Player() :
 	animation_time(0.0f),
 	animation_count(0),
 	old_panel(ePanelID::NONE),
+	panel(ePanelID::NONE),
 	is_power_up(false),
-	is_destroy(false)
+	is_destroy(false),
+	respawn_time(0.0f),
+	player_speed(0.0f),
+	sounds()
 {
 
 }
@@ -35,6 +39,10 @@ void Player::Initialize()
 	move_animation = rm->GetImages("Resource/Images/pacman.png", 12, 12, 1, 32, 32);
 	dying_animation = rm->GetImages("Resource/Images/dying.png", 11, 11, 1, 32, 32);
 
+	sounds[0] = rm->GetSounds("Resource/Sounds/credit.mp3");
+	sounds[1] = rm->GetSounds("Resource/Sounds/miss.mp3");
+	PlaySoundMem(sounds[0], DX_PLAYTYPE_LOOP);
+
 	// 当たり判定の設定
 	collision.is_blocking = true;
 	collision.object_type = eObjectType::player;
@@ -50,6 +58,10 @@ void Player::Initialize()
 
 	// 可動性の設定
 	mobility = eMobilityType::Movable;
+
+	respawn_time = 3.0f;
+
+
 }
 
 void Player::Update(float delta_second)
@@ -62,6 +74,8 @@ void Player::Update(float delta_second)
 			image = move_animation[9];
 			break;
 		case ePlayerState::MOVE:
+			//移動速度の変更
+			player_speed = 0.8;
 			// 移動処理
 			Movement(delta_second);
 			// アニメーション制御
@@ -74,6 +88,7 @@ void Player::Update(float delta_second)
 			{
 				animation_time = 0.0f;
 				animation_count++;
+			
 				// 復活させる
 				if(animation_count >= dying_animation.size())
 				{
@@ -81,8 +96,8 @@ void Player::Update(float delta_second)
 					animation_count = 0;
 					is_destroy = true;
 				}
-			}
 			image = dying_animation[animation_count];
+			}
 			break;
 		default:
 			break;
@@ -190,6 +205,11 @@ bool Player::GetDestroy() const
 	return is_destroy;
 }
 
+ePanelID Player::GetPPanel() const
+{
+	return panel;
+}
+
 /// <summary>
 /// 移動処理
 /// </summary>
@@ -253,7 +273,8 @@ void Player::Movement(float delta_second)
 	InputManager* input = InputManager::GetInstance();
 
 	// 現在パネルの状態を確認
-	ePanelID panel = StageData::GetPanelData(location);
+	//ePanelID panel = StageData::GetPanelData(location);
+	panel = StageData::GetPanelData(location);
 
 	// 入力から移動方向を設定
 	if(input->GetKeyDown(KEY_INPUT_UP) || input->GetButtonDown(XINPUT_BUTTON_DPAD_UP))
@@ -267,6 +288,7 @@ void Player::Movement(float delta_second)
 				now_direction_state = eDirectionState::UP;
 				break;
 
+			//先行入力の場合
 			default:
 				next_direction_state = eDirectionState::UP;
 		}	

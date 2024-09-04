@@ -3,13 +3,13 @@
 #include "../EnemyBase.h"
 #include "../../Utility/StageData.h"
 
-class RedEnemy : public EnemyBase
+class PinkEnemy : public EnemyBase
 {
 private:
-	const int move_num[2] = { 0, 1 };                     //移動アニメーションの順番
+	const int move_num[2] = { 2, 3 };                     //移動アニメーションの順番
 public:
-	RedEnemy();
-	~RedEnemy();
+	PinkEnemy();
+	~PinkEnemy();
 
 	//初期化処理
 	virtual void Initialize() override;

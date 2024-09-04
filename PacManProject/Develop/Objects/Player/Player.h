@@ -39,8 +39,12 @@ private:
 	float animation_time;					// アニメーション時間
 	int animation_count;					// アニメーション添字
 	ePanelID old_panel;						// 前回パネル情報
+	ePanelID panel;
 	bool is_power_up;						// パワー餌を食べたか？
 	bool is_destroy;						// 死んだ状態になったか？
+	int sounds[5];
+	float respawn_time;
+	float player_speed;
 
 	// 移動アニメーションの順番
 	const int animation_num[4] = { 0, 1, 2, 1, };
@@ -89,6 +93,8 @@ public:
 	/// </summary>
 	/// <returns>プレイヤーの状態</returns>
 	bool GetDestroy() const;
+
+	ePanelID GetPPanel() const;
 
 
 private:

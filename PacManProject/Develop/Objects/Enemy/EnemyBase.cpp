@@ -1,16 +1,17 @@
 #include "EnemyBase.h"
 #include "../../Utility/InputManager.h"
 #include "../../Utility/ResourceManager.h"
+#include "../Player/Player.h"
 #include "DxLib.h"
 
-#define D_ENEMY_SPEED (50.0f / enemy_speed)
-#define D_IZIKE_TIME (12.0f)
+#define D_ENEMY_SPEED (50.0f * enemy_speed)
+#define D_IZIKE_TIME (9.0f)
 
 EnemyBase::EnemyBase():
 	direction(0.0f),
 	enemy_state(eEnemyState::TERRITORY),
 	now_direction(eEnemyDirectionState::UP),
-	old_direction(eEnemyDirectionState::UP),
+	next_direction(eEnemyDirectionState::UP),
 	old_panel(ePanelID::NONE),
 	animation_time(0.0f),
 	izike_time(0.0f),
@@ -18,10 +19,15 @@ EnemyBase::EnemyBase():
 	enemy_speed(0.0f),
 	animation_count(0),
 	eye(NULL),
+	distance(0),
+	step_number(0),
+	panel_x(0),
+	panel_y(0),
 	in_tunnel(false),
 	izike(false),
 	player_powerd(false),
-	end_anim(false)
+	end_anim(false),
+	object(nullptr)
 {
 }
 
@@ -59,7 +65,7 @@ void EnemyBase::Initialize()
 	direction = Vector2D(2.5f, 0.0f);
 
 	//速度設定
-	enemy_speed = 1;
+	enemy_speed = 0.75;
 
 	//イジケ時間を設定
 	izike_time = D_IZIKE_TIME;
@@ -68,20 +74,23 @@ void EnemyBase::Initialize()
 //更新処理
 void EnemyBase::Update(float delta_second)
 {
-	//enemy_stateの中身で処理を変える
+	//エネミー状態によって、動作を変える
 	switch (enemy_state)
 	{
 	case eEnemyState::IZIKE:
-		enemy_speed = 2;
+		//移動速度の変更
+		//enemy_speed = 0.75 * 0.9;
+		enemy_speed = 0.5;
+		//移動処理
 		MovementBase(delta_second);
 		// 移動中のアニメーション
 		animation_time += delta_second;
-		if (animation_time >= (1.0f / 16.0f))
+		if (animation_time >= (1.0f / 7.0f))
 		{
 			animation_time = 0.0f;
 			animation_count++;
 
-			//アニメーションフラグ
+			//アニメーション変更フラグ
 			if (end_anim == false)
 			{
 				if (animation_count >= 2)
@@ -89,7 +98,7 @@ void EnemyBase::Update(float delta_second)
 					animation_count = 0;
 				}
 				// 画像の設定
-				image = move_animation[izike_order[animation_count]];
+				image = move_animation[izike_num[animation_count]];
 			}
 			else
 			{
@@ -98,13 +107,16 @@ void EnemyBase::Update(float delta_second)
 					animation_count = 0;
 				}
 				// 画像の設定
-				image = move_animation[izikeend_order[animation_count]];
+				image = move_animation[izikeend_num[animation_count]];
 			}
 		}
 		break;
 	case eEnemyState::EYE:
-		enemy_speed = 0.5;
+		//移動速度の変更
+		enemy_speed = 3;
+		//移動処理
 		MovementBase(delta_second);
+		//アニメーション制御
 		AnimationBase(delta_second);
 		break;
 	}
@@ -130,14 +142,14 @@ void EnemyBase::Update(float delta_second)
 			enemy_state = eEnemyState::TRACK;
 			//イジケ状態を解除
 			izike = false;
-			//プレイヤーパワーダウンフラグ
+			//プレイヤーをパワーダウンさせる
 			player_powerd = true;
 		}
 	}
 	//イジケ状態じゃなかったら
 	else
 	{
-		//値の再初期化
+		//値のリセット
 		end_anim = false;
 		player_powerd = false;
 		izike_time = D_IZIKE_TIME;
@@ -146,8 +158,12 @@ void EnemyBase::Update(float delta_second)
 	// 入力状態の取得
 	InputManager* input = InputManager::GetInstance();
 
+	//Bキーを押したら通常モードに変更
 	if (input->GetKeyDown(KEY_INPUT_B) && enemy_state == eEnemyState::EYE)
 	{
+		//プレイヤーをパワーダウンさせる
+		player_powerd = true;
+		//追跡状態にする
 		enemy_state = eEnemyState::TRACK;
 	}
 }
@@ -227,62 +243,67 @@ bool EnemyBase::GetPlayerDown() const
 	return player_powerd;
 }
 
+ePanelID EnemyBase::GetEPanel() const
+{
+	return old_panel;
+}
+
 //進行方向の設定
 void EnemyBase::SetDirection(const Vector2D& direction)
 {
 	this->direction = direction;
 }
 
-//イジケ状態フラグをオン
+//イジケ状態に設定
 void EnemyBase::SetIzikeState()
 {
-	izike = true;
+	this->izike = true;  
 }
 
 //共通移動処理
 void EnemyBase::MovementBase(float delta_second)
 {
+	//移動する
 	location += direction * D_ENEMY_SPEED * delta_second;
-
-	//進行方向によって進行方向状態を変更する
-	if (direction.x > 0)
-	{
-		now_direction = eEnemyDirectionState::RIGHT;
-	}
-	else if (direction.x < 0)
-	{
-		now_direction = eEnemyDirectionState::LEFT;
-	}
-	else if (direction.y < 0)
-	{
-		now_direction = eEnemyDirectionState::UP;
-	}
-	else if (direction.y > 0)
-	{
-		now_direction = eEnemyDirectionState::DOWN;
-	}
-
 }
 
 //共通アニメーション制御
 void EnemyBase::AnimationBase(float delta_second)
 {
-	//進行方向によって目の向きが変わる
-	switch (now_direction)
+	//進行方向によって目の向きを変える
+	if (direction.x > 0)
 	{
-	case eEnemyDirectionState::UP:
-		eye = eye_animation[0];
-		break;
-	case eEnemyDirectionState::RIGHT:
+		//右を向く
 		eye = eye_animation[1];
-		break;
-	case eEnemyDirectionState::DOWN:
-		eye = eye_animation[2];
-		break;
-	case eEnemyDirectionState::LEFT:
-		eye = eye_animation[3];
-		break;
-	default:
-		break;
 	}
+	else if (direction.x < 0)
+	{
+		//左を向く
+		eye = eye_animation[3];
+	}
+	else if (direction.y < 0)
+	{
+		//上を向く
+		eye = eye_animation[0];
+	}
+	else if (direction.y > 0)
+	{
+		//下を向く
+		eye = eye_animation[2];
+	}
+}
+
+void EnemyBase::SetPlayerControl(Player* player)
+{
+	object = player;
+}
+
+int EnemyBase::PanelDistance(int a, int b)
+{
+	int p_x, p_y;
+	StageData::ConvertToIndex(object->GetLocation(), p_y, p_x);
+	int e_x, e_y;
+	StageData::ConvertToIndex(GetLocation(), e_y, e_x);
+	int distance = (((abs(p_x - e_x)) + a) + ((abs(p_y - e_y)) + b));
+	return distance;
 }
